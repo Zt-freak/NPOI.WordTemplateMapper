@@ -1,4 +1,7 @@
-﻿using NPOI.XWPF.UserModel;
+﻿using NPOI.OpenXmlFormats.Wordprocessing;
+using NPOI.XWPF.UserModel;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace NPOI.WordMapper.Extensions
 {
@@ -26,14 +29,112 @@ namespace NPOI.WordMapper.Extensions
             return rowParagraphs;
         }
 
-        public static XWPFTableRow MapDictionaryToRow(this XWPFTableRow @this, IDictionary<string, object> mappingDictionary)
+        public static List<Dictionary<string, object>> GetMappingList(this XWPFTableRow @this, KeyValuePair<string, IEnumerable<object>>? mappingPair)
         {
-            throw new NotImplementedException();
+            if (mappingPair == null)
+                return new();
+
+            List<Dictionary<string, object>> mappingList = mappingPair.ToList();
+            if (!@this.GetParagraphsWithMappings(mappingList.First()).Any())
+                return new();
+
+            return mappingList;
         }
 
-        public static XWPFTableRow MapEnumerableToRow(this XWPFTableRow @this, KeyValuePair<string, IEnumerable<object>> mappingObject)
+        public static XWPFTableRow MapDictionaryToRow(this XWPFTableRow @this, IDictionary<string, object> mappingDictionary)
         {
-            throw new NotImplementedException();
+            List<XWPFParagraph> paragraphs = new();
+            @this.GetTableCells().ForEach(
+                tableCell => paragraphs.AddRange(tableCell.Paragraphs)
+            );
+
+            paragraphs.ForEach(
+                paragraph => paragraph.MapParagraph(mappingDictionary)
+            );
+
+            return @this;
+        }
+
+        public static XWPFTableRow MapEnumerableToRow(this XWPFTableRow @this, KeyValuePair<string, IEnumerable<object>> mappingPair)
+        {
+            XWPFTable parentTable = @this.GetTable();
+
+            List<XWPFParagraph> paragraphs = new();
+            @this.GetTableCells().ForEach(
+                tableCell => paragraphs.AddRange(tableCell.Paragraphs)
+            );
+
+            List<XWPFTableRow> newRows = new();
+            for (int i = 0; i < mappingPair.Value.Count(); i++)
+            {
+                CT_Row newCtRow = @this.GetCTRow().Copy();
+                XWPFTableRow copiedRow = new(newCtRow, @this.GetTable());
+                newRows.Add(copiedRow);
+            }
+
+            int newRowsIndex = 0;
+            foreach (object mappingObject in mappingPair.Value)
+            {
+                IDictionary<string, object> mappingDictionary = new Dictionary<string, object>();
+                PropertyInfo[] propertiesInfo = mappingObject.GetType().GetProperties();
+
+                foreach (PropertyInfo propertyInfo in propertiesInfo)
+                {
+                    Regex rgx = new("[^a-zA-Z0-9 -]");
+                    string mappingPairKeyWithoutNonAlphanumeric = rgx.Replace(mappingPair.Key, string.Empty);
+                    string mappingKey = mappingPair.Key.Replace(mappingPairKeyWithoutNonAlphanumeric, $"{mappingPairKeyWithoutNonAlphanumeric}.{propertyInfo.Name}");
+
+                    mappingDictionary.Add(mappingKey, propertyInfo.GetValue(mappingObject)!);
+                }
+
+                int position = parentTable.Rows.IndexOf(@this);
+
+                XWPFTableRow copiedRow = newRows[newRowsIndex];
+                newRowsIndex++;
+
+                parentTable.AddRow(copiedRow, position);
+
+                copiedRow.MapDictionaryToRow(mappingDictionary);
+            }
+
+            parentTable.RemoveRow(parentTable.Rows.IndexOf(@this));
+
+            return @this;
+        }
+
+        public static XWPFTableRow MapEnumerableToRow(this XWPFTableRow @this, List<Dictionary<string, object>> mappingList)
+        {
+            XWPFTable parentTable = @this.GetTable();
+
+            List<XWPFParagraph> paragraphs = new();
+            @this.GetTableCells().ForEach(
+                tableCell => paragraphs.AddRange(tableCell.Paragraphs)
+            );
+
+            List<XWPFTableRow> newRows = new();
+            for (int i = 0; i < mappingList.Count(); i++)
+            {
+                CT_Row newCtRow = @this.GetCTRow().Copy();
+                XWPFTableRow copiedRow = new(newCtRow, @this.GetTable());
+                newRows.Add(copiedRow);
+            }
+
+            int newRowsIndex = 0;
+            foreach (Dictionary<string, object> mappingDictionary in mappingList)
+            {
+                int position = parentTable.Rows.IndexOf(@this);
+
+                XWPFTableRow copiedRow = newRows[newRowsIndex];
+                newRowsIndex++;
+
+                parentTable.AddRow(copiedRow, position);
+
+                copiedRow.MapDictionaryToRow(mappingDictionary);
+            }
+
+            parentTable.RemoveRow(parentTable.Rows.IndexOf(@this));
+
+            return @this;
         }
     }
 }

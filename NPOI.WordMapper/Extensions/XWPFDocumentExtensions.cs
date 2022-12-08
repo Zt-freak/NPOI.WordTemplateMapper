@@ -1,4 +1,5 @@
-﻿using NPOI.XWPF.UserModel;
+﻿using NPOI.Util;
+using NPOI.XWPF.UserModel;
 
 namespace NPOI.WordMapper.Extensions
 {
@@ -22,12 +23,14 @@ namespace NPOI.WordMapper.Extensions
                     mappingObject = new(tableCaption, mappingEnumerable);
                 }
 
-                foreach (XWPFTableRow tableRow in table.Rows)
+                for(int i = table.Rows.Count - 1; i >= 0; i--)
                 {
-                    tableRow.MapDictionaryToRow(mappingDictionary);
+                    XWPFTableRow currentRow = table.Rows[i];
+                    currentRow.MapDictionaryToRow(mappingDictionary);
 
-                    if (mappingObject != null)
-                        tableRow.MapEnumerableToRow((KeyValuePair<string, IEnumerable<object>>)mappingObject);
+                    List<Dictionary<string, object>> mappingList = currentRow.GetMappingList(mappingObject);
+                    if (mappingList.Any())
+                        currentRow.MapEnumerableToRow(mappingList);
                 }
             }
 
