@@ -15,7 +15,8 @@ Dictionary<string, object> data = new()
     { "{{NeverGivingYouUp}}", "Rick Astley" },
     { "{{ListTotal}}", 42069 },
     { "{{Pokemon}}", new { Name = "Pikachu" } },
-    { "{{Phone}}", new { Brand = new { Name = "Huawei"} } }
+    { "{{Phone}}", new { Brand = new { Name = "Huawei"} } },
+    { "{{Actions}}", new string[] { "give you up", "let you down", "run around and desert you" } }
 };
 
 // Get the Document

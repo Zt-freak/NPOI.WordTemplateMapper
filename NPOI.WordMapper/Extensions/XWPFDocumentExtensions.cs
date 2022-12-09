@@ -7,15 +7,21 @@ namespace NPOI.WordMapper.Extensions
         public static XWPFDocument MapDocument(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
         {
             @this.MapTables(mappingDictionary);
+            //@this.MapLists(mappingDictionary);
             @this.MapBody(mappingDictionary);
-            @this.MapHeader(mappingDictionary);
-            @this.MapFooter(mappingDictionary);
+            //@this.MapHeader(mappingDictionary);
+            //@this.MapFooter(mappingDictionary);
+            //@this.MapPictures(mappingDictionary);
             return @this;
         }
 
         public static XWPFDocument MapBody(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
         {
-            throw new NotImplementedException();
+            foreach (XWPFParagraph? paragraph in @this.Paragraphs)
+            {
+                paragraph.MapParagraph(mappingDictionary);
+            }
+            return @this;
         }
 
         public static XWPFDocument MapFooter(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
@@ -28,12 +34,26 @@ namespace NPOI.WordMapper.Extensions
             throw new NotImplementedException();
         }
 
+        public static XWPFDocument MapLists(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static XWPFDocument MapPictures(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
+        {
+            throw new NotImplementedException();
+        }
+
         public static XWPFDocument MapTables(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
         {
             foreach (XWPFTable table in @this.Tables)
             {
                 KeyValuePair<string, IEnumerable<object>>? mappingObject = null;
                 string tableCaption = table.TableCaption;
+
+                // ToDo: check for mappingKey in TableCaption instead
+                // tableCaption.Contains(???);
+
                 if (mappingDictionary.ContainsKey(tableCaption))
                 {
                     IEnumerable<object> mappingEnumerable = (IEnumerable<object>)mappingDictionary[tableCaption];
