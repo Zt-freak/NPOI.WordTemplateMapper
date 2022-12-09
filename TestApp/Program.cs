@@ -3,17 +3,19 @@ using NPOI.XWPF.UserModel;
 
 // Assemble the data
 List<object> theList = new() {
-    new { A = "chirp", B = "meow", C = "woof", D = "moo", E = "baah", F = "quack"},
-    new { A = "monday", B = "tuesday", C = "wednesday", D = "thursday", E = "friday", F = "saturday"},
-    new { A = "red", B = "green", C = "blue", D = "yellow", E = "magenta", F = "cyan"},
-    new { A = "belgium", B = "denmark", C = "spain", D = "austria", E = "monaco", F = "angola"},
+    new { A = "Chirp", B = "Meow", C = "Woof", D = "Moo", E = "Bonjour", F = "Quack"},
+    new { A = "Monday", B = "Tuesday", C = "Wednesday", D = "Thursday", E = "Friday", F = "Saturday"},
+    new { A = "Red", B = "Green", C = "Blue", D = "Yellow", E = "Magenta", F = "Cyan"},
+    new { A = "Belgium", B = "Denmark", C = "Spain", D = "Austria", E = "Monaco", F = "Angola"},
+    new { A = PokeType.Water, B = PokeType.Grass, C = PokeType.Fire, D = PokeType.Ghost, E = PokeType.Electric, F = PokeType.Fighting},
 };
 Dictionary<string, object> data = new()
 {
     { "{{List}}", theList },
-    { "{{SomeValue}}", "Rick Astley" },
+    { "{{NeverGivingYouUp}}", "Rick Astley" },
     { "{{ListTotal}}", 42069 },
-    { "{{Pokemon}}", new { Name = "Pikachu", PokeType = PokeType.Electric } }
+    { "{{Pokemon}}", new { Name = "Pikachu" } },
+    { "{{Phone}}", new { Brand = new { Name = "Huawei"} } }
 };
 
 // Get the Document

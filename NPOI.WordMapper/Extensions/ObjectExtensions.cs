@@ -5,15 +5,17 @@ namespace NPOI.WordMapper.Extensions
 {
     public static class ObjectExtensions
     {
+        private static readonly string alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s]+";
         public static Dictionary<string, object> ToDictionary(this object @this, string prependKey)
         {
             Dictionary<string, object> mappingDictionary = new();
-            Regex rgx = new("[^a-zA-Z0-9 -]");
             PropertyInfo[] propertiesInfo = @this.GetType().GetProperties();
 
             foreach (PropertyInfo propertyInfo in propertiesInfo)
             {
-                string mappingPairKeyWithoutNonAlphanumeric = rgx.Replace(prependKey, string.Empty);
+                MatchCollection mappingPairKeyMatches = Regex.Matches(input: prependKey, pattern: alphaNumericSelectorRegex);
+                string mappingPairKeyWithoutNonAlphanumeric = string.Join(string.Empty, from Match match in mappingPairKeyMatches select match.Value);
+
                 string mappingKey = prependKey.Replace(mappingPairKeyWithoutNonAlphanumeric, $"{mappingPairKeyWithoutNonAlphanumeric}.{propertyInfo.Name}");
 
                 mappingDictionary.Add(mappingKey, propertyInfo.GetValue(@this)!);

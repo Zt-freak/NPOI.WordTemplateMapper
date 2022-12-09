@@ -1,5 +1,4 @@
-﻿using NPOI.Util;
-using NPOI.XWPF.UserModel;
+﻿using NPOI.XWPF.UserModel;
 
 namespace NPOI.WordMapper.Extensions
 {
@@ -8,7 +7,25 @@ namespace NPOI.WordMapper.Extensions
         public static XWPFDocument MapDocument(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
         {
             @this.MapTables(mappingDictionary);
+            @this.MapBody(mappingDictionary);
+            @this.MapHeader(mappingDictionary);
+            @this.MapFooter(mappingDictionary);
             return @this;
+        }
+
+        public static XWPFDocument MapBody(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static XWPFDocument MapFooter(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static XWPFDocument MapHeader(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
+        {
+            throw new NotImplementedException();
         }
 
         public static XWPFDocument MapTables(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
@@ -33,7 +50,6 @@ namespace NPOI.WordMapper.Extensions
                         currentRow.MapEnumerableToRow(mappingList);
                 }
             }
-
             return @this;
         }
     }
