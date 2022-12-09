@@ -1,4 +1,4 @@
-﻿using NPOI.WordMapper.Extensions;
+﻿using NPOI.WordTemplateMapper.Extensions;
 using NPOI.XWPF.UserModel;
 
 // Assemble the data
@@ -12,10 +12,12 @@ List<object> theList = new() {
 Dictionary<string, object> data = new()
 {
     { "{{List}}", theList },
-    { "{{NeverGivingYouUp}}", "Rick Astley" },
+    { "{{CoolSinger}}", "Rick Astley" },
     { "{{ListTotal}}", 42069 },
-    { "{{Pokemon}}", new { Name = "Pikachu" } },
-    { "{{Phone}}", new { Brand = new { Name = "Huawei"} } }
+    { "{{Pokemon}}", new { Name = "Pikachu", PokeType = PokeType.Electric } },
+    { "{{Phone}}", new { Brand = new { Name = "Huawei"}, Model = "Mate 50 Pro" } },
+    { "{{Actions}}", new string[] { "give you up", "let you down", "run around and desert you" } },
+    { "{{Wow}}", new Array[] { new object[] { new { Yay = "waaaa" } } } }
 };
 
 // Get the Document

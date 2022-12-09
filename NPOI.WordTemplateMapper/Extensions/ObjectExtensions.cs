@@ -1,11 +1,12 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace NPOI.WordMapper.Extensions
+namespace NPOI.WordTemplateMapper.Extensions
 {
     public static class ObjectExtensions
     {
-        private static readonly string alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s]+";
+        private static readonly string alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s\[\]]+";
+
         public static Dictionary<string, object> ToDictionary(this object @this, string prependKey)
         {
             Dictionary<string, object> mappingDictionary = new();
