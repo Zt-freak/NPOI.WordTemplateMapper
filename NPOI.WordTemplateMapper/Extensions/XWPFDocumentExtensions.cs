@@ -1,47 +1,43 @@
 ﻿using NPOI.XWPF.UserModel;
 
-namespace NPOI.WordMapper.Extensions
+namespace NPOI.WordTemplateMapper.Extensions
 {
     public static class XWPFDocumentExtensions
     {
         public static XWPFDocument MapDocument(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
         {
-            @this.MapTables(mappingDictionary);
-            //@this.MapLists(mappingDictionary);
             @this.MapBody(mappingDictionary);
-            //@this.MapHeader(mappingDictionary);
-            //@this.MapFooter(mappingDictionary);
-            //@this.MapPictures(mappingDictionary);
+            @this.MapHeader(mappingDictionary);
+            @this.MapFooter(mappingDictionary);
+            @this.MapTables(mappingDictionary);
+
             return @this;
         }
 
         public static XWPFDocument MapBody(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
         {
             foreach (XWPFParagraph? paragraph in @this.Paragraphs)
-            {
                 paragraph.MapParagraph(mappingDictionary);
-            }
+
             return @this;
         }
 
         public static XWPFDocument MapFooter(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
         {
-            throw new NotImplementedException();
+            foreach (XWPFFooter footer in @this.FooterList)
+                foreach (XWPFParagraph? paragraph in footer.Paragraphs)
+                    paragraph.MapParagraph(mappingDictionary);
+
+            return @this;
         }
 
         public static XWPFDocument MapHeader(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
         {
-            throw new NotImplementedException();
-        }
+            foreach (XWPFHeader header in @this.HeaderList)
+                foreach (XWPFParagraph? paragraph in header.Paragraphs)
+                    paragraph.MapParagraph(mappingDictionary);
 
-        public static XWPFDocument MapLists(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static XWPFDocument MapPictures(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
-        {
-            throw new NotImplementedException();
+            return @this;
         }
 
         public static XWPFDocument MapTables(this XWPFDocument @this, IDictionary<string, object> mappingDictionary)
@@ -51,13 +47,15 @@ namespace NPOI.WordMapper.Extensions
                 KeyValuePair<string, IEnumerable<object>>? mappingObject = null;
                 string tableCaption = table.TableCaption;
 
-                // ToDo: check for mappingKey in TableCaption instead
-                // tableCaption.Contains(???);
-
-                if (mappingDictionary.ContainsKey(tableCaption))
+                KeyValuePair<string, object> mappingPair = mappingDictionary.FirstOrDefault(m => tableCaption.Contains(m.Key));
+                if (mappingPair.Value is IEnumerable<object>)
                 {
-                    IEnumerable<object> mappingEnumerable = (IEnumerable<object>)mappingDictionary[tableCaption];
-                    mappingObject = new(tableCaption, mappingEnumerable);
+                    IEnumerable<object> mappingEnumerable = (IEnumerable<object>)mappingPair.Value;
+                    mappingObject = new(mappingPair.Key, mappingEnumerable);
+
+                    string newCaption = table.TableCaption.Replace(mappingPair.Key, string.Empty);
+                    if (!string.IsNullOrWhiteSpace(newCaption))
+                        table.TableCaption = newCaption;
                 }
 
                 for(int i = table.Rows.Count - 1; i >= 0; i--)

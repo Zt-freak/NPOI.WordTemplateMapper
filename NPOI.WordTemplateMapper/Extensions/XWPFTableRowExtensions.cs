@@ -1,7 +1,7 @@
 ﻿using NPOI.OpenXmlFormats.Wordprocessing;
 using NPOI.XWPF.UserModel;
 
-namespace NPOI.WordMapper.Extensions
+namespace NPOI.WordTemplateMapper.Extensions
 {
     public static class XWPFTableRowExtensions
     {

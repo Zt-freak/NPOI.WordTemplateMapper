@@ -1,7 +1,7 @@
 ﻿using NPOI.XWPF.UserModel;
 using System.Text.RegularExpressions;
 
-namespace NPOI.WordMapper.Extensions
+namespace NPOI.WordTemplateMapper.Extensions
 {
     public static class XWPFParagraphExtensions
     {
@@ -17,8 +17,28 @@ namespace NPOI.WordMapper.Extensions
         {
             foreach (KeyValuePair<string, object> mapping in mappingDictionary)
             {
-                KeyValuePair<string, string> mappedValue = @this.GetMappedValue(mapping);
-                @this.ReplaceText(mappedValue.Key, mappedValue.Value);
+                if (mapping.Value is IList<object> mappingList)
+                {
+                    KeyValuePair<string, IList<object>> listMapping = new(mapping.Key, mappingList);
+                    Dictionary<string, object> innerMappingDictionary = listMapping.ToIndexDictionary();
+                    @this.MapParagraph(innerMappingDictionary);
+                }
+
+                bool keepMapping = true;
+                do
+                {
+                    KeyValuePair<string, string> mappedValue = @this.GetMappedValue(mapping);
+                    string oldText = $"{@this.Text}";
+                    string newText = @this.Text.Replace(mappedValue.Key, mappedValue.Value);
+
+                    // Workaround for malfunctioning ReplaceText from NPOI
+                    if (!string.IsNullOrWhiteSpace(newText))
+                        @this.ReplaceText(@this.Text, newText);
+
+                    if (oldText == @this.Text)
+                        keepMapping = false;
+                }
+                while (keepMapping);
             }
 
             return @this;
@@ -31,8 +51,11 @@ namespace NPOI.WordMapper.Extensions
 
             if(mappingToEvaluate.Value.GetType().IsValueType || mappingToEvaluate.Value.GetType() == typeof(string))
                 return new(mappingToEvaluate.Key, mappingToEvaluate.Value.ToString()!);
-            
-            if(mappingToEvaluate.Value is IList<object>)
+
+            if(mappingToEvaluate.Value is IEnumerable<object>)
+                return new(mappingToEvaluate.Key, string.Empty);
+
+            if (mappingToEvaluate.Value is IList<object> mappingList)
             {
                 MatchCollection MappingKeyMatches = Regex.Matches(input: mappingToEvaluate.Key, pattern: _alphaNumericSelectorRegex);
                 string alphaNumericMappingKey = string.Join(string.Empty, from Match match in MappingKeyMatches select match.Value);
@@ -40,8 +63,8 @@ namespace NPOI.WordMapper.Extensions
                 MatchCollection paragraphTextMatches = Regex.Matches(input: @this.Text, pattern: _alphaNumericSelectorRegex);
                 if (paragraphTextMatches.Any(m => m.Value.Contains(alphaNumericMappingKey)))
                 {
-                    KeyValuePair<string, IList<object>> enumerableMappingToEvaluate = new(mappingToEvaluate.Key, (IList<object>)mappingToEvaluate.Value);
-                    @this.MapEnumerableFromPair(enumerableMappingToEvaluate, paragraphTextMatches);
+                    KeyValuePair<string, IList<object>> enumerableMappingToEvaluate = new(mappingToEvaluate.Key, mappingList);
+                    return @this.MapEnumerableFromPair(enumerableMappingToEvaluate, paragraphTextMatches);
                 }
 
                 return new(mappingToEvaluate.Key, string.Empty);
@@ -64,23 +87,28 @@ namespace NPOI.WordMapper.Extensions
                 if (alphaNumericParagraphText.Contains(alphaNumericMappingKey))
                     return GetMappedValue(@this, mappingPair);
             }
-            return new(mappingToEvaluate.Key, string.Empty);
+            return new(mappingToEvaluate.Key, mappingToEvaluate.Value.ToString()!);
         }
 
         private static KeyValuePair<string, string> MapEnumerableFromPair(this XWPFParagraph @this, KeyValuePair<string, IList<object>> mappingToEvaluate, MatchCollection paragraphTextMatches)
         {
             Match[] enumerableMatches = paragraphTextMatches.Where(m => Regex.IsMatch(m.Value, _arrayBracketsRegex)).ToArray();
 
-            Dictionary<string, object> mappingDictionary = mappingToEvaluate.Value.ToIndexDictionary(mappingToEvaluate.Key);
+            Dictionary<string, object> mappingDictionary = mappingToEvaluate.ToIndexDictionary(mappingToEvaluate.Key);
             foreach (Match match in enumerableMatches)
             {
-                MatchCollection MappingKeyMatches = Regex.Matches(input: mappingToEvaluate.Key, pattern: _alphaNumericSelectorRegex);
-                string alphaNumericMappingKey = string.Join(string.Empty, from Match keyMatch in MappingKeyMatches select keyMatch.Value);
+                KeyValuePair<string, object> mappingPair = mappingDictionary.FirstOrDefault( m =>
+                {
+                    MatchCollection MappingKeyMatches = Regex.Matches(input: m.Key, pattern: _alphaNumericSelectorRegex);
+                    string alphaNumericMappingKey = string.Join(string.Empty, from Match match in MappingKeyMatches select match.Value);
+                    return alphaNumericMappingKey == match.Value;
+                });
 
-                Match indexMatch = Regex.Match(match.Value, _arrayBracketsRegex);
-                int index = int.Parse(indexMatch.Groups[0].Value);
+                if (mappingPair.Key == null)
+                    continue;
 
-                mappingDictionary.Add("", mappingToEvaluate.Value[index]);
+                if (@this.Text.Contains(mappingPair.Key))
+                    return GetMappedValue(@this, mappingPair);
             }
             return new(mappingToEvaluate.Key, string.Empty);
         }
