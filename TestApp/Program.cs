@@ -1,4 +1,4 @@
-﻿using NPOI.WordTemplateMapper.Extensions;
+﻿using NPOI.WordTemplateMapper.Extensions.XWPF;
 using NPOI.XWPF.UserModel;
 
 // Assemble the data
