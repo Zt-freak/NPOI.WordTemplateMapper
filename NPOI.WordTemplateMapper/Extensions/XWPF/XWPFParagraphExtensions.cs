@@ -1,7 +1,8 @@
-﻿using NPOI.XWPF.UserModel;
+﻿using NPOI.WordTemplateMapper.Extensions;
+using NPOI.XWPF.UserModel;
 using System.Text.RegularExpressions;
 
-namespace NPOI.WordTemplateMapper.Extensions
+namespace NPOI.WordTemplateMapper.Extensions.XWPF
 {
     public static class XWPFParagraphExtensions
     {
@@ -49,10 +50,10 @@ namespace NPOI.WordTemplateMapper.Extensions
             if (mappingToEvaluate.Value == null)
                 return new(mappingToEvaluate.Key, string.Empty);
 
-            if(mappingToEvaluate.Value.GetType().IsValueType || mappingToEvaluate.Value.GetType() == typeof(string))
+            if (mappingToEvaluate.Value.GetType().IsValueType || mappingToEvaluate.Value.GetType() == typeof(string))
                 return new(mappingToEvaluate.Key, mappingToEvaluate.Value.ToString()!);
 
-            if(mappingToEvaluate.Value is IEnumerable<object>)
+            if (mappingToEvaluate.Value is IEnumerable<object>)
                 return new(mappingToEvaluate.Key, string.Empty);
 
             if (mappingToEvaluate.Value is IList<object> mappingList)
@@ -85,7 +86,7 @@ namespace NPOI.WordTemplateMapper.Extensions
                 string alphaNumericParagraphText = string.Join(string.Empty, from Match match in paragraphTextMatches select match.Value);
 
                 if (alphaNumericParagraphText.Contains(alphaNumericMappingKey))
-                    return GetMappedValue(@this, mappingPair);
+                    return @this.GetMappedValue(mappingPair);
             }
             return new(mappingToEvaluate.Key, mappingToEvaluate.Value.ToString()!);
         }
@@ -97,7 +98,7 @@ namespace NPOI.WordTemplateMapper.Extensions
             Dictionary<string, object> mappingDictionary = mappingToEvaluate.ToIndexDictionary(mappingToEvaluate.Key);
             foreach (Match match in enumerableMatches)
             {
-                KeyValuePair<string, object> mappingPair = mappingDictionary.FirstOrDefault( m =>
+                KeyValuePair<string, object> mappingPair = mappingDictionary.FirstOrDefault(m =>
                 {
                     MatchCollection MappingKeyMatches = Regex.Matches(input: m.Key, pattern: _alphaNumericSelectorRegex);
                     string alphaNumericMappingKey = string.Join(string.Empty, from Match match in MappingKeyMatches select match.Value);
@@ -108,7 +109,7 @@ namespace NPOI.WordTemplateMapper.Extensions
                     continue;
 
                 if (@this.Text.Contains(mappingPair.Key))
-                    return GetMappedValue(@this, mappingPair);
+                    return @this.GetMappedValue(mappingPair);
             }
             return new(mappingToEvaluate.Key, string.Empty);
         }

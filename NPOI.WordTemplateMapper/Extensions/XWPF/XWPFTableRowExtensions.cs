@@ -1,7 +1,7 @@
 ﻿using NPOI.OpenXmlFormats.Wordprocessing;
 using NPOI.XWPF.UserModel;
 
-namespace NPOI.WordTemplateMapper.Extensions
+namespace NPOI.WordTemplateMapper.Extensions.XWPF
 {
     public static class XWPFTableRowExtensions
     {
@@ -9,7 +9,8 @@ namespace NPOI.WordTemplateMapper.Extensions
         {
             List<XWPFParagraph> rowParagraphs = new();
             @this.GetTableCells().ForEach(
-                tableCell => {
+                tableCell =>
+                {
                     rowParagraphs.AddRange(tableCell.Paragraphs.Where(p => p.GetContainedMappings(mappingDictionary).Any()));
                 }
             );
