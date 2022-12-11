@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPOI.WordTemplateMapper", "NPOI.WordTemplateMapper\NPOI.WordTemplateMapper.csproj", "{0962A894-9267-43BD-B388-6B608A65C944}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPOI.WordTemplateMapper", "NPOI.WordTemplateMapper\NPOI.WordTemplateMapper.csproj", "{0962A894-9267-43BD-B388-6B608A65C944}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{E2FF5719-625D-4711-8DC6-3AC95EE4E970}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{E2FF5719-625D-4711-8DC6-3AC95EE4E970}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPOI.XWPFTemplateMapper.Interfaces", "NPOI.XWPFTemplateMapper.Interfaces\NPOI.XWPFTemplateMapper.Interfaces.csproj", "{C8673ACA-F4E0-4510-98C9-C32F703D44CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{E2FF5719-625D-4711-8DC6-3AC95EE4E970}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2FF5719-625D-4711-8DC6-3AC95EE4E970}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2FF5719-625D-4711-8DC6-3AC95EE4E970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8673ACA-F4E0-4510-98C9-C32F703D44CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8673ACA-F4E0-4510-98C9-C32F703D44CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8673ACA-F4E0-4510-98C9-C32F703D44CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8673ACA-F4E0-4510-98C9-C32F703D44CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

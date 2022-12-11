@@ -1,13 +1,14 @@
 ﻿using NPOI.OpenXmlFormats.Wordprocessing;
 using NPOI.WordTemplateMapper.Extensions;
 using NPOI.XWPF.UserModel;
+using NPOI.XWPFTemplateMapper.Interfaces.XWPF;
 
 namespace NPOI.WordTemplateMapper.XWPF
 {
-    public class XWPFTableRowMapper
+    public class XWPFTableRowMapper : IXWPFTableRowMapper
     {
-        private readonly XWPFParagraphMapper _paragraphMapper;
-        public XWPFTableRowMapper(XWPFParagraphMapper? paragraphMapper = null)
+        private readonly IXWPFParagraphMapper _paragraphMapper;
+        public XWPFTableRowMapper(IXWPFParagraphMapper? paragraphMapper = null)
         {
             if (paragraphMapper == null)
                 _paragraphMapper = new XWPFParagraphMapper();

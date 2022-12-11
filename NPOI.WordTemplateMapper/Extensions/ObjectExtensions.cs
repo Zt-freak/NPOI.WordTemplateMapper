@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace NPOI.WordTemplateMapper.Extensions
 {
-    public static class ObjectExtensions
+    internal static class ObjectExtensions
     {
         private static readonly string alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s\[\]]+";
 
-        public static Dictionary<string, object> ToDictionary(this object @this, string prependKey)
+        internal static Dictionary<string, object> ToDictionary(this object @this, string prependKey)
         {
             Dictionary<string, object> mappingDictionary = new();
             PropertyInfo[] propertiesInfo = @this.GetType().GetProperties();

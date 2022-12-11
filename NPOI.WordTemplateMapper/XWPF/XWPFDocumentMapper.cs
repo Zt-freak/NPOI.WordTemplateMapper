@@ -1,12 +1,13 @@
 ﻿using NPOI.XWPF.UserModel;
+using NPOI.XWPFTemplateMapper.Interfaces.XWPF;
 
 namespace NPOI.WordTemplateMapper.XWPF
 {
-    public class XWPFDocumentMapper
+    public class XWPFDocumentMapper : IXWPFDocumentMapper
     {
-        private readonly XWPFParagraphMapper _paragraphMapper;
-        private readonly XWPFTableRowMapper _tableRowMapper;
-        public XWPFDocumentMapper(XWPFParagraphMapper? paragraphMapper = null, XWPFTableRowMapper tableRowMapper = null)
+        private readonly IXWPFParagraphMapper _paragraphMapper;
+        private readonly IXWPFTableRowMapper _tableRowMapper;
+        public XWPFDocumentMapper(IXWPFParagraphMapper? paragraphMapper = null, IXWPFTableRowMapper? tableRowMapper = null)
         {
             if (paragraphMapper == null)
                 _paragraphMapper = new XWPFParagraphMapper();

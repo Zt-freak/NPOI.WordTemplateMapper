@@ -1,10 +1,11 @@
 ﻿using NPOI.WordTemplateMapper.Extensions;
 using NPOI.XWPF.UserModel;
+using NPOI.XWPFTemplateMapper.Interfaces.XWPF;
 using System.Text.RegularExpressions;
 
 namespace NPOI.WordTemplateMapper.XWPF
 {
-    public class XWPFParagraphMapper
+    public class XWPFParagraphMapper : IXWPFParagraphMapper
     {
         private static readonly string _alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s\[\]]+";
         private static readonly string _arrayBracketsRegex = @"\[([0-9]+)\]";
