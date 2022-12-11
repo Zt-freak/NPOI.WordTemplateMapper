@@ -2,11 +2,11 @@
 
 namespace NPOI.WordTemplateMapper.Extensions
 {
-    public static class KeyValuePairExtensions
+    internal static class KeyValuePairExtensions
     {
         private static readonly string alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s\[\]]+";
 
-        public static List<Dictionary<string, object>> ToList(this KeyValuePair<string, IEnumerable<object>>? @this)
+        internal static List<Dictionary<string, object>> ToList(this KeyValuePair<string, IEnumerable<object>>? @this)
         {
             if (@this == null)
                 return new();
@@ -23,7 +23,7 @@ namespace NPOI.WordTemplateMapper.Extensions
             return dictionaryList;
         }
 
-        public static Dictionary<string, object> ToIndexDictionary(this KeyValuePair<string, IList<object>> @this, string? prependKey = null)
+        internal static Dictionary<string, object> ToIndexDictionary(this KeyValuePair<string, IList<object>> @this, string? prependKey = null)
         {
             Dictionary<string, object> mappingDictionary = new();
 

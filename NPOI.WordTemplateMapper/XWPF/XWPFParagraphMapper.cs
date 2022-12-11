@@ -1,20 +1,21 @@
 ﻿using NPOI.WordTemplateMapper.Extensions;
 using NPOI.XWPF.UserModel;
+using NPOI.XWPFTemplateMapper.Interfaces.XWPF;
 using System.Text.RegularExpressions;
 
-namespace NPOI.WordTemplateMapper.Extensions.XWPF
+namespace NPOI.WordTemplateMapper.XWPF
 {
-    public static class XWPFParagraphExtensions
+    public class XWPFParagraphMapper : IXWPFParagraphMapper
     {
         private static readonly string _alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s\[\]]+";
         private static readonly string _arrayBracketsRegex = @"\[([0-9]+)\]";
-        public static IDictionary<string, object> GetContainedMappings(this XWPFParagraph @this, IDictionary<string, object> mappingDictionary)
+        public IDictionary<string, object> GetContainedMappings(XWPFParagraph paragraph, IDictionary<string, object> mappingDictionary)
         {
-            Dictionary<string, object> subsetDictionary = mappingDictionary.Where(mapping => @this.Text.Contains(mapping.Key)).ToDictionary(pair => pair.Key, pair => pair.Value);
+            Dictionary<string, object> subsetDictionary = mappingDictionary.Where(mapping => paragraph.Text.Contains(mapping.Key)).ToDictionary(pair => pair.Key, pair => pair.Value);
             return subsetDictionary;
         }
 
-        public static XWPFParagraph MapParagraph(this XWPFParagraph @this, IDictionary<string, object> mappingDictionary)
+        public XWPFParagraph MapParagraph(XWPFParagraph paragraph, IDictionary<string, object> mappingDictionary)
         {
             foreach (KeyValuePair<string, object> mapping in mappingDictionary)
             {
@@ -22,30 +23,30 @@ namespace NPOI.WordTemplateMapper.Extensions.XWPF
                 {
                     KeyValuePair<string, IList<object>> listMapping = new(mapping.Key, mappingList);
                     Dictionary<string, object> innerMappingDictionary = listMapping.ToIndexDictionary();
-                    @this.MapParagraph(innerMappingDictionary);
+                    MapParagraph(paragraph, innerMappingDictionary);
                 }
 
                 bool keepMapping = true;
                 do
                 {
-                    KeyValuePair<string, string> mappedValue = @this.GetMappedValue(mapping);
-                    string oldText = $"{@this.Text}";
-                    string newText = @this.Text.Replace(mappedValue.Key, mappedValue.Value);
+                    KeyValuePair<string, string> mappedValue = GetMappedValue(paragraph, mapping);
+                    string oldText = $"{paragraph.Text}";
+                    string newText = paragraph.Text.Replace(mappedValue.Key, mappedValue.Value);
 
                     // Workaround for malfunctioning ReplaceText from NPOI
                     if (!string.IsNullOrWhiteSpace(newText))
-                        @this.ReplaceText(@this.Text, newText);
+                        paragraph.ReplaceText(paragraph.Text, newText);
 
-                    if (oldText == @this.Text)
+                    if (oldText == paragraph.Text)
                         keepMapping = false;
                 }
                 while (keepMapping);
             }
 
-            return @this;
+            return paragraph;
         }
 
-        private static KeyValuePair<string, string> GetMappedValue(this XWPFParagraph @this, KeyValuePair<string, object> mappingToEvaluate)
+        private KeyValuePair<string, string> GetMappedValue(XWPFParagraph paragraph, KeyValuePair<string, object> mappingToEvaluate)
         {
             if (mappingToEvaluate.Value == null)
                 return new(mappingToEvaluate.Key, string.Empty);
@@ -61,20 +62,20 @@ namespace NPOI.WordTemplateMapper.Extensions.XWPF
                 MatchCollection MappingKeyMatches = Regex.Matches(input: mappingToEvaluate.Key, pattern: _alphaNumericSelectorRegex);
                 string alphaNumericMappingKey = string.Join(string.Empty, from Match match in MappingKeyMatches select match.Value);
 
-                MatchCollection paragraphTextMatches = Regex.Matches(input: @this.Text, pattern: _alphaNumericSelectorRegex);
+                MatchCollection paragraphTextMatches = Regex.Matches(input: paragraph.Text, pattern: _alphaNumericSelectorRegex);
                 if (paragraphTextMatches.Any(m => m.Value.Contains(alphaNumericMappingKey)))
                 {
                     KeyValuePair<string, IList<object>> enumerableMappingToEvaluate = new(mappingToEvaluate.Key, mappingList);
-                    return @this.MapEnumerableFromPair(enumerableMappingToEvaluate, paragraphTextMatches);
+                    return MapEnumerableFromPair(paragraph, enumerableMappingToEvaluate, paragraphTextMatches);
                 }
 
                 return new(mappingToEvaluate.Key, string.Empty);
             }
 
-            return @this.MapDictionaryFromPair(mappingToEvaluate);
+            return MapDictionaryFromPair(paragraph, mappingToEvaluate);
         }
 
-        private static KeyValuePair<string, string> MapDictionaryFromPair(this XWPFParagraph @this, KeyValuePair<string, object> mappingToEvaluate)
+        private KeyValuePair<string, string> MapDictionaryFromPair(XWPFParagraph paragraph, KeyValuePair<string, object> mappingToEvaluate)
         {
             Dictionary<string, object> mappingDictionary = mappingToEvaluate.Value.ToDictionary(mappingToEvaluate.Key);
             foreach (KeyValuePair<string, object> mappingPair in mappingDictionary)
@@ -82,16 +83,16 @@ namespace NPOI.WordTemplateMapper.Extensions.XWPF
                 MatchCollection MappingKeyMatches = Regex.Matches(input: mappingPair.Key, pattern: _alphaNumericSelectorRegex);
                 string alphaNumericMappingKey = string.Join(string.Empty, from Match match in MappingKeyMatches select match.Value);
 
-                MatchCollection paragraphTextMatches = Regex.Matches(input: @this.Text, pattern: _alphaNumericSelectorRegex);
+                MatchCollection paragraphTextMatches = Regex.Matches(input: paragraph.Text, pattern: _alphaNumericSelectorRegex);
                 string alphaNumericParagraphText = string.Join(string.Empty, from Match match in paragraphTextMatches select match.Value);
 
                 if (alphaNumericParagraphText.Contains(alphaNumericMappingKey))
-                    return @this.GetMappedValue(mappingPair);
+                    return GetMappedValue(paragraph, mappingPair);
             }
             return new(mappingToEvaluate.Key, mappingToEvaluate.Value.ToString()!);
         }
 
-        private static KeyValuePair<string, string> MapEnumerableFromPair(this XWPFParagraph @this, KeyValuePair<string, IList<object>> mappingToEvaluate, MatchCollection paragraphTextMatches)
+        private KeyValuePair<string, string> MapEnumerableFromPair(XWPFParagraph paragraph, KeyValuePair<string, IList<object>> mappingToEvaluate, MatchCollection paragraphTextMatches)
         {
             Match[] enumerableMatches = paragraphTextMatches.Where(m => Regex.IsMatch(m.Value, _arrayBracketsRegex)).ToArray();
 
@@ -108,8 +109,8 @@ namespace NPOI.WordTemplateMapper.Extensions.XWPF
                 if (mappingPair.Key == null)
                     continue;
 
-                if (@this.Text.Contains(mappingPair.Key))
-                    return @this.GetMappedValue(mappingPair);
+                if (paragraph.Text.Contains(mappingPair.Key))
+                    return GetMappedValue(paragraph, mappingPair);
             }
             return new(mappingToEvaluate.Key, string.Empty);
         }
