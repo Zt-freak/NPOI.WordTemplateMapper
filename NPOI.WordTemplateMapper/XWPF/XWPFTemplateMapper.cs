@@ -1,4 +1,5 @@
-﻿using NPOI.WordTemplateMapper.Core.XWPF;
+﻿using NPOI.WordTemplateMapper.Core;
+using NPOI.WordTemplateMapper.Core.XWPF;
 using NPOI.XWPF.UserModel;
 
 namespace NPOI.WordTemplateMapper.XWPF
@@ -8,12 +9,34 @@ namespace NPOI.WordTemplateMapper.XWPF
         private readonly XWPFDocument _document;
         private readonly IDictionary<string, object> _mappingDictionary;
         private readonly IXWPFParagraphManager _paragraphManager;
+        private readonly IXWPFTableRowManager _tableRowManager;
+        private readonly IKeyValuePairManager _keyValuePairManager;
+        private readonly IObjectManager _objectManager;
 
-        public XWPFTemplateMapper(XWPFDocument document, IDictionary<string, object> mappingDictionary, IXWPFParagraphManager paragraphManager)
+        public XWPFTemplateMapper(XWPFDocument document, IDictionary<string, object> mappingDictionary, IXWPFParagraphManager? paragraphManager = null, IXWPFTableRowManager? tableRowManager = null, IKeyValuePairManager? keyValuePairManager = null, IObjectManager? objectManager = null)
         {
             _document = document;
             _mappingDictionary = mappingDictionary;
-            _paragraphManager = paragraphManager;
+
+            if (objectManager != null)
+                _objectManager = objectManager;
+            else
+                _objectManager = new ObjectManager();
+
+            if (keyValuePairManager != null)
+                _keyValuePairManager = keyValuePairManager;
+            else
+                _keyValuePairManager = new KeyValuePairManager(_objectManager);
+
+            if (paragraphManager != null)
+                _paragraphManager = paragraphManager;
+            else
+                _paragraphManager = new XWPFParagraphManager(_keyValuePairManager, _objectManager);
+
+            if (tableRowManager != null)
+                _tableRowManager = tableRowManager;
+            else
+                _tableRowManager = new XWPFTableRowManager(_paragraphManager, _keyValuePairManager, _objectManager);
         }
 
         public XWPFDocument MapDocument()
@@ -54,12 +77,12 @@ namespace NPOI.WordTemplateMapper.XWPF
 
         public XWPFDocument MapTables()
         {
-            foreach (XWPFTable table in @this.Tables)
+            foreach (XWPFTable table in _document.Tables)
             {
                 KeyValuePair<string, IEnumerable<object>>? mappingObject = null;
                 string tableCaption = table.TableCaption;
 
-                KeyValuePair<string, object> mappingPair = mappingDictionary.FirstOrDefault(m => tableCaption.Contains(m.Key));
+                KeyValuePair<string, object> mappingPair = _mappingDictionary.FirstOrDefault(m => tableCaption.Contains(m.Key));
                 if (mappingPair.Value is IEnumerable<object> mappingEnumerable)
                 {
                     mappingObject = new(mappingPair.Key, mappingEnumerable);
@@ -72,11 +95,13 @@ namespace NPOI.WordTemplateMapper.XWPF
                 for (int i = table.Rows.Count - 1; i >= 0; i--)
                 {
                     XWPFTableRow currentRow = table.Rows[i];
-                    currentRow.MapDictionaryToRow(mappingDictionary);
 
-                    List<Dictionary<string, object>> mappingList = currentRow.GetMappingList(mappingObject);
+                    List<Dictionary<string, object>> mappingList = _tableRowManager.GetMappingList(currentRow, mappingObject);
                     if (mappingList.Any())
-                        currentRow.MapEnumerableToRow(mappingList);
+                    {
+                        _tableRowManager.MapDictionaryToRow(currentRow, _mappingDictionary);
+                        _tableRowManager.MapEnumerableToRow(currentRow, mappingList);
+                    }
                 }
             }
             return _document;

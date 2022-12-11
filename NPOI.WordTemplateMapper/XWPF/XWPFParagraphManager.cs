@@ -1,5 +1,5 @@
-﻿using NPOI.WordTemplateMapper.Core.XWPF;
-using NPOI.WordTemplateMapper.Extensions;
+﻿using NPOI.WordTemplateMapper.Core;
+using NPOI.WordTemplateMapper.Core.XWPF;
 using NPOI.XWPF.UserModel;
 using System.Text.RegularExpressions;
 
@@ -9,21 +9,37 @@ namespace NPOI.WordTemplateMapper.XWPF
     {
         private static readonly string _alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s\[\]]+";
         private static readonly string _arrayBracketsRegex = @"\[([0-9]+)\]";
-        public static IDictionary<string, object> GetContainedMappings(XWPFParagraph @this, IDictionary<string, object> mappingDictionary)
+
+        private readonly IKeyValuePairManager _keyValuePairManager;
+        private readonly IObjectManager _objectManager;
+        public XWPFParagraphManager(IKeyValuePairManager? keyValuePairManager = null, IObjectManager? objectManager = null)
         {
-            Dictionary<string, object> subsetDictionary = mappingDictionary.Where(mapping => @this.Text.Contains(mapping.Key)).ToDictionary(pair => pair.Key, pair => pair.Value);
+            if (objectManager != null)
+                _objectManager = objectManager;
+            else
+                _objectManager = new ObjectManager();
+
+            if (keyValuePairManager != null)
+                _keyValuePairManager = keyValuePairManager;
+            else
+                _keyValuePairManager = new KeyValuePairManager(_objectManager);
+        }
+
+        public IDictionary<string, object> GetContainedMappings(XWPFParagraph paragraph, IDictionary<string, object> mappingDictionary)
+        {
+            Dictionary<string, object> subsetDictionary = mappingDictionary.Where(mapping => paragraph.Text.Contains(mapping.Key)).ToDictionary(pair => pair.Key, pair => pair.Value);
             return subsetDictionary;
         }
 
-        public static XWPFParagraph MapParagraph(XWPFParagraph paragraph, IDictionary<string, object> mappingDictionary)
+        public XWPFParagraph MapParagraph(XWPFParagraph paragraph, IDictionary<string, object> mappingDictionary)
         {
             foreach (KeyValuePair<string, object> mapping in mappingDictionary)
             {
                 if (mapping.Value is IList<object> mappingList)
                 {
                     KeyValuePair<string, IList<object>> listMapping = new(mapping.Key, mappingList);
-                    Dictionary<string, object> innerMappingDictionary = listMapping.ToIndexDictionary();
-                    paragraph.MapParagraph(innerMappingDictionary);
+                    Dictionary<string, object> innerMappingDictionary = _keyValuePairManager.ToIndexDictionary(listMapping);
+                    MapParagraph(paragraph, innerMappingDictionary);
                 }
 
                 bool keepMapping = true;
@@ -46,7 +62,7 @@ namespace NPOI.WordTemplateMapper.XWPF
             return paragraph;
         }
 
-        private static KeyValuePair<string, string> GetMappedValue(XWPFParagraph paragraph, KeyValuePair<string, object> mappingToEvaluate)
+        private KeyValuePair<string, string> GetMappedValue(XWPFParagraph paragraph, KeyValuePair<string, object> mappingToEvaluate)
         {
             if (mappingToEvaluate.Value == null)
                 return new(mappingToEvaluate.Key, string.Empty);
@@ -75,9 +91,9 @@ namespace NPOI.WordTemplateMapper.XWPF
             return MapDictionaryFromPair(paragraph, mappingToEvaluate);
         }
 
-        private static KeyValuePair<string, string> MapDictionaryFromPair(XWPFParagraph paragraph, KeyValuePair<string, object> mappingToEvaluate)
+        private KeyValuePair<string, string> MapDictionaryFromPair(XWPFParagraph paragraph, KeyValuePair<string, object> mappingToEvaluate)
         {
-            Dictionary<string, object> mappingDictionary = mappingToEvaluate.Value.ToDictionary(mappingToEvaluate.Key);
+            Dictionary<string, object> mappingDictionary = _objectManager.ToDictionary(mappingToEvaluate.Value, mappingToEvaluate.Key);
             foreach (KeyValuePair<string, object> mappingPair in mappingDictionary)
             {
                 MatchCollection MappingKeyMatches = Regex.Matches(input: mappingPair.Key, pattern: _alphaNumericSelectorRegex);
@@ -92,11 +108,11 @@ namespace NPOI.WordTemplateMapper.XWPF
             return new(mappingToEvaluate.Key, mappingToEvaluate.Value.ToString()!);
         }
 
-        private static KeyValuePair<string, string> MapEnumerableFromPair(XWPFParagraph paragraph, KeyValuePair<string, IList<object>> mappingToEvaluate, MatchCollection paragraphTextMatches)
+        private KeyValuePair<string, string> MapEnumerableFromPair(XWPFParagraph paragraph, KeyValuePair<string, IList<object>> mappingToEvaluate, MatchCollection paragraphTextMatches)
         {
             Match[] enumerableMatches = paragraphTextMatches.Where(m => Regex.IsMatch(m.Value, _arrayBracketsRegex)).ToArray();
 
-            Dictionary<string, object> mappingDictionary = mappingToEvaluate.ToIndexDictionary(mappingToEvaluate.Key);
+            Dictionary<string, object> mappingDictionary = _keyValuePairManager.ToIndexDictionary(mappingToEvaluate, mappingToEvaluate.Key);
             foreach (Match match in enumerableMatches)
             {
                 KeyValuePair<string, object> mappingPair = mappingDictionary.FirstOrDefault(m =>

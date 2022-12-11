@@ -1,16 +1,17 @@
-﻿using System.Reflection;
+﻿using NPOI.WordTemplateMapper.Core;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace NPOI.WordTemplateMapper.Extensions
+namespace NPOI.WordTemplateMapper
 {
-    public static class ObjectExtensions
+    internal class ObjectManager : IObjectManager
     {
         private static readonly string alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s\[\]]+";
 
-        public static Dictionary<string, object> ToDictionary(this object @this, string prependKey)
+        public Dictionary<string, object> ToDictionary(object mappableObject, string prependKey)
         {
             Dictionary<string, object> mappingDictionary = new();
-            PropertyInfo[] propertiesInfo = @this.GetType().GetProperties();
+            PropertyInfo[] propertiesInfo = mappableObject.GetType().GetProperties();
 
             foreach (PropertyInfo propertyInfo in propertiesInfo)
             {
@@ -19,7 +20,7 @@ namespace NPOI.WordTemplateMapper.Extensions
 
                 string mappingKey = prependKey.Replace(mappingPairKeyWithoutNonAlphanumeric, $"{mappingPairKeyWithoutNonAlphanumeric}.{propertyInfo.Name}");
 
-                mappingDictionary.Add(mappingKey, propertyInfo.GetValue(@this)!);
+                mappingDictionary.Add(mappingKey, propertyInfo.GetValue(mappableObject)!);
             }
             return mappingDictionary;
         }

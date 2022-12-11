@@ -1,37 +1,47 @@
-﻿using System.Text.RegularExpressions;
+﻿using NPOI.WordTemplateMapper.Core;
+using System.Text.RegularExpressions;
 
-namespace NPOI.WordTemplateMapper.Extensions
+namespace NPOI.WordTemplateMapper
 {
-    public static class KeyValuePairExtensions
+    internal class KeyValuePairManager : IKeyValuePairManager
     {
         private static readonly string alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s\[\]]+";
+        private readonly IObjectManager _objectManager;
 
-        public static List<Dictionary<string, object>> ToList(this KeyValuePair<string, IEnumerable<object>>? @this)
+        public KeyValuePairManager(IObjectManager objectManager)
         {
-            if (@this == null)
+            if (objectManager != null)
+                _objectManager = objectManager;
+            else
+                _objectManager = new ObjectManager();
+        }
+
+        public List<Dictionary<string, object>> ToList(KeyValuePair<string, IEnumerable<object>>? pair)
+        {
+            if (pair == null)
                 return new();
 
             List<Dictionary<string, object>> dictionaryList = new();
-            KeyValuePair<string, IEnumerable<object>> mappingPair = (KeyValuePair<string, IEnumerable<object>>)@this;
+            KeyValuePair<string, IEnumerable<object>> mappingPair = (KeyValuePair<string, IEnumerable<object>>)pair;
 
             foreach (object mappingObject in mappingPair.Value)
             {
-                Dictionary<string, object> mappingDictionary = mappingObject.ToDictionary(mappingPair.Key);
+                Dictionary<string, object> mappingDictionary = _objectManager.ToDictionary(mappingObject, mappingPair.Key);
                 dictionaryList.Add(mappingDictionary);
             }
 
             return dictionaryList;
         }
 
-        public static Dictionary<string, object> ToIndexDictionary(this KeyValuePair<string, IList<object>> @this, string? prependKey = null)
+        public Dictionary<string, object> ToIndexDictionary(KeyValuePair<string, IList<object>> pair, string? prependKey = null)
         {
             Dictionary<string, object> mappingDictionary = new();
 
             if (string.IsNullOrEmpty(prependKey))
-                prependKey = @this.Key;
+                prependKey = pair.Key;
 
             int listItemIndex = 0;
-            foreach (object listItem in @this.Value)
+            foreach (object listItem in pair.Value)
             {
                 MatchCollection mappingPairKeyMatches = Regex.Matches(input: prependKey, pattern: alphaNumericSelectorRegex);
                 string mappingPairKeyWithoutNonAlphanumeric = string.Join(string.Empty, from Match match in mappingPairKeyMatches select match.Value);
