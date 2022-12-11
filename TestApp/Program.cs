@@ -1,4 +1,4 @@
-﻿using NPOI.WordTemplateMapper.Extensions.XWPF;
+﻿using NPOI.WordTemplateMapper.XWPF;
 using NPOI.XWPF.UserModel;
 
 // Assemble the data
@@ -26,8 +26,10 @@ using FileStream fileStream = File.OpenRead(template);
 XWPFDocument document = new(fileStream);
 
 // Map document
-XWPFTableMapper mapper = new();
-mapper.MapDocument(document, data);
+XWPFParagraphMapper paragraphMapper = new();
+XWPFDocumentMapper documentMapper = new();
+
+documentMapper.MapDocument(document, data);
 
 // Create new document
 string generateFile = @"output.docx";

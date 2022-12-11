@@ -1,9 +1,24 @@
 ﻿using NPOI.XWPF.UserModel;
 
-namespace NPOI.WordTemplateMapper.Extensions.XWPF
+namespace NPOI.WordTemplateMapper.XWPF
 {
-    public class XWPFTableMapper
+    public class XWPFDocumentMapper
     {
+        private readonly XWPFParagraphMapper _paragraphMapper;
+        private readonly XWPFTableRowMapper _tableRowMapper;
+        public XWPFDocumentMapper(XWPFParagraphMapper? paragraphMapper = null, XWPFTableRowMapper tableRowMapper = null)
+        {
+            if (paragraphMapper == null)
+                _paragraphMapper = new XWPFParagraphMapper();
+            else
+                _paragraphMapper = paragraphMapper;
+
+            if (tableRowMapper == null)
+                _tableRowMapper = new XWPFTableRowMapper();
+            else
+                _tableRowMapper = tableRowMapper;
+        }
+
         public XWPFDocument MapDocument(XWPFDocument document, IDictionary<string, object> mappingDictionary)
         {
             MapBody(document, mappingDictionary);
@@ -17,7 +32,7 @@ namespace NPOI.WordTemplateMapper.Extensions.XWPF
         public XWPFDocument MapBody(XWPFDocument document, IDictionary<string, object> mappingDictionary)
         {
             foreach (XWPFParagraph? paragraph in document.Paragraphs)
-                paragraph.MapParagraph(mappingDictionary);
+                _paragraphMapper.MapParagraph(paragraph, mappingDictionary);
 
             return document;
         }
@@ -26,7 +41,7 @@ namespace NPOI.WordTemplateMapper.Extensions.XWPF
         {
             foreach (XWPFFooter footer in document.FooterList)
                 foreach (XWPFParagraph? paragraph in footer.Paragraphs)
-                    paragraph.MapParagraph(mappingDictionary);
+                    _paragraphMapper.MapParagraph(paragraph, mappingDictionary);
 
             return document;
         }
@@ -35,7 +50,7 @@ namespace NPOI.WordTemplateMapper.Extensions.XWPF
         {
             foreach (XWPFHeader header in document.HeaderList)
                 foreach (XWPFParagraph? paragraph in header.Paragraphs)
-                    paragraph.MapParagraph(mappingDictionary);
+                    _paragraphMapper.MapParagraph(paragraph, mappingDictionary);
 
             return document;
         }
@@ -60,11 +75,11 @@ namespace NPOI.WordTemplateMapper.Extensions.XWPF
                 for (int i = table.Rows.Count - 1; i >= 0; i--)
                 {
                     XWPFTableRow currentRow = table.Rows[i];
-                    currentRow.MapDictionaryToRow(mappingDictionary);
+                    _tableRowMapper.MapDictionaryToRow(currentRow, mappingDictionary);
 
-                    List<Dictionary<string, object>> mappingList = currentRow.GetMappingList(mappingObject);
+                    List<Dictionary<string, object>> mappingList = _tableRowMapper.GetMappingList(currentRow, mappingObject);
                     if (mappingList.Any())
-                        currentRow.MapEnumerableToRow(mappingList);
+                        _tableRowMapper.MapEnumerableToRow(currentRow, mappingList);
                 }
             }
             return document;
