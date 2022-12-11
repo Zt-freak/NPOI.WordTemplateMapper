@@ -1,6 +1,6 @@
 ﻿using NPOI.XWPF.UserModel;
 
-namespace NPOI.WordTemplateMapper.Extensions
+namespace NPOI.WordTemplateMapper.Extensions.XWPF
 {
     public static class XWPFDocumentExtensions
     {
@@ -48,9 +48,8 @@ namespace NPOI.WordTemplateMapper.Extensions
                 string tableCaption = table.TableCaption;
 
                 KeyValuePair<string, object> mappingPair = mappingDictionary.FirstOrDefault(m => tableCaption.Contains(m.Key));
-                if (mappingPair.Value is IEnumerable<object>)
+                if (mappingPair.Value is IEnumerable<object> mappingEnumerable)
                 {
-                    IEnumerable<object> mappingEnumerable = (IEnumerable<object>)mappingPair.Value;
                     mappingObject = new(mappingPair.Key, mappingEnumerable);
 
                     string newCaption = table.TableCaption.Replace(mappingPair.Key, string.Empty);
@@ -58,7 +57,7 @@ namespace NPOI.WordTemplateMapper.Extensions
                         table.TableCaption = newCaption;
                 }
 
-                for(int i = table.Rows.Count - 1; i >= 0; i--)
+                for (int i = table.Rows.Count - 1; i >= 0; i--)
                 {
                     XWPFTableRow currentRow = table.Rows[i];
                     currentRow.MapDictionaryToRow(mappingDictionary);
