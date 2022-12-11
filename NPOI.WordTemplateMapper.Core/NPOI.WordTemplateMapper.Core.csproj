@@ -10,8 +10,4 @@
     <PackageReference Include="NPOI" Version="2.6.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NPOI.WordTemplateMapper.Core\NPOI.WordTemplateMapper.Core.csproj" />
-  </ItemGroup>
-
 </Project>
