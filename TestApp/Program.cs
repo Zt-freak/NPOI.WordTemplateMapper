@@ -26,7 +26,8 @@ using FileStream fileStream = File.OpenRead(template);
 XWPFDocument document = new(fileStream);
 
 // Map document
-document.MapDocument(data);
+XWPFTableMapper mapper = new();
+mapper.MapDocument(document, data);
 
 // Create new document
 string generateFile = @"output.docx";
