@@ -78,9 +78,12 @@ namespace NPOI.WordTemplateMapper.XWPF
                     XWPFTableRow currentRow = table.Rows[i];
                     _tableRowMapper.MapDictionaryToRow(currentRow, mappingDictionary);
 
-                    List<Dictionary<string, object>> mappingList = _tableRowMapper.GetMappingList(currentRow, mappingObject);
-                    if (mappingList.Any())
-                        _tableRowMapper.MapEnumerableToRow(currentRow, mappingList);
+                    if(mappingObject != null)
+                    {
+                        List<Dictionary<string, object>> mappingList = _tableRowMapper.GetMappingList(currentRow, mappingObject);
+                        if (mappingList != null && mappingList.Any())
+                            _tableRowMapper.MapEnumerableToRow(currentRow, mappingList);
+                    }
                 }
             }
             return document;

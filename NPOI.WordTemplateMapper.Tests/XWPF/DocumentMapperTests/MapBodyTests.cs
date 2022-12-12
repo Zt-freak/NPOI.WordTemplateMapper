@@ -10,7 +10,6 @@ namespace NPOI.WordTemplateMapper.Tests.XWPF.DocumentMapperTests
         public void ItShould_IterateOverEveryParagraph()
         {
             Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
-
             paragraphMapperMock
                 .Setup(p => p.MapParagraph(
                     It.IsAny<XWPFParagraph>(),

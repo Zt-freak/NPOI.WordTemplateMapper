@@ -29,10 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TestDocuments\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Update="TestDocuments\test3.docx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TestDocuments\test1.docx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

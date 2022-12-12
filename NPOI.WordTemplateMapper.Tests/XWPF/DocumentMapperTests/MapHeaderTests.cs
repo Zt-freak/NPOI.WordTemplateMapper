@@ -10,7 +10,6 @@ namespace NPOI.WordTemplateMapper.Tests.XWPF.DocumentMapperTests
         public void ItShould_IterateOverEveryParagraph()
         {
             Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
-
             paragraphMapperMock
                 .Setup(p => p.MapParagraph(
                     It.IsAny<XWPFParagraph>(),
@@ -26,17 +25,17 @@ namespace NPOI.WordTemplateMapper.Tests.XWPF.DocumentMapperTests
             using FileStream fileStream = File.OpenRead(template);
             XWPFDocument document = new(fileStream);
 
-            int paragraphCount = document.HeaderList.Select(f => f.Paragraphs).Count();
+            int paragraphCount = document.HeaderList.Select(h => h.Paragraphs).Count();
 
             XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
             mapper.MapHeader(document, data);
 
-            Assert.Equal(paragraphCount, document.HeaderList.Select(f => f.Paragraphs).Count());
+            Assert.Equal(paragraphCount, document.HeaderList.Select(h => h.Paragraphs).Count());
             paragraphMapperMock.Verify(
                 pm => pm.MapParagraph(
                     It.IsAny<XWPFParagraph>(),
                     It.IsAny<IDictionary<string, object>>()),
-                    Times.Exactly(document.HeaderList.Select(f => f.Paragraphs).Count()
+                    Times.Exactly(document.HeaderList.Select(h => h.Paragraphs).Count()
                 )
             );
         }
