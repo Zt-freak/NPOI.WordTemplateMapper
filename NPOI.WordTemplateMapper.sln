@@ -7,7 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPOI.WordTemplateMapper", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{E2FF5719-625D-4711-8DC6-3AC95EE4E970}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPOI.XWPFTemplateMapper.Interfaces", "NPOI.XWPFTemplateMapper.Interfaces\NPOI.XWPFTemplateMapper.Interfaces.csproj", "{C8673ACA-F4E0-4510-98C9-C32F703D44CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPOI.XWPFTemplateMapper.Interfaces", "NPOI.XWPFTemplateMapper.Interfaces\NPOI.XWPFTemplateMapper.Interfaces.csproj", "{C8673ACA-F4E0-4510-98C9-C32F703D44CA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPOI.WordTemplateMapper.Tests", "NPOI.WordTemplateMapper.Tests\NPOI.WordTemplateMapper.Tests.csproj", "{26E0F71B-38F2-4225-A0C7-C3340E11C844}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{8774F4C6-EA92-46AF-A633-CD64B5617686}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4276BA48-9EC2-42C1-8B6B-23C647706A72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,9 +33,19 @@ Global
 		{C8673ACA-F4E0-4510-98C9-C32F703D44CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8673ACA-F4E0-4510-98C9-C32F703D44CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8673ACA-F4E0-4510-98C9-C32F703D44CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26E0F71B-38F2-4225-A0C7-C3340E11C844}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26E0F71B-38F2-4225-A0C7-C3340E11C844}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26E0F71B-38F2-4225-A0C7-C3340E11C844}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26E0F71B-38F2-4225-A0C7-C3340E11C844}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0962A894-9267-43BD-B388-6B608A65C944} = {8774F4C6-EA92-46AF-A633-CD64B5617686}
+		{E2FF5719-625D-4711-8DC6-3AC95EE4E970} = {4276BA48-9EC2-42C1-8B6B-23C647706A72}
+		{C8673ACA-F4E0-4510-98C9-C32F703D44CA} = {8774F4C6-EA92-46AF-A633-CD64B5617686}
+		{26E0F71B-38F2-4225-A0C7-C3340E11C844} = {4276BA48-9EC2-42C1-8B6B-23C647706A72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44AEBCE0-DD62-47FE-A1D9-8E897AA6CD0B}

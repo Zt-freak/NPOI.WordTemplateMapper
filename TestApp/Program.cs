@@ -26,7 +26,6 @@ using FileStream fileStream = File.OpenRead(template);
 XWPFDocument document = new(fileStream);
 
 // Map document
-XWPFParagraphMapper paragraphMapper = new();
 XWPFDocumentMapper documentMapper = new();
 
 documentMapper.MapDocument(document, data);
