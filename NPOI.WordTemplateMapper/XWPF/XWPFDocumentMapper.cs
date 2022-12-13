@@ -7,6 +7,9 @@ namespace NPOI.WordTemplateMapper.XWPF
     {
         private readonly IXWPFParagraphMapper _paragraphMapper;
         private readonly IXWPFTableRowMapper _tableRowMapper;
+        public IXWPFParagraphMapper ParagraphMapper { get { return _paragraphMapper; } }
+        public IXWPFTableRowMapper TableRowMapper { get { return _tableRowMapper; } }
+
         public XWPFDocumentMapper(IXWPFParagraphMapper? paragraphMapper = null, IXWPFTableRowMapper? tableRowMapper = null)
         {
             if (paragraphMapper == null)
