@@ -1,5 +1,5 @@
 ﻿using NPOI.XWPF.UserModel;
-using NPOI.XWPFTemplateMapper.Interfaces.XWPF;
+using NPOI.WordTemplateMapper.Interfaces.XWPF;
 
 namespace NPOI.WordTemplateMapper.XWPF
 {

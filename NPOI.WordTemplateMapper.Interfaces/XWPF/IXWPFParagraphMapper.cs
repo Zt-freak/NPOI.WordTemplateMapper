@@ -1,6 +1,6 @@
 ﻿using NPOI.XWPF.UserModel;
 
-namespace NPOI.XWPFTemplateMapper.Interfaces.XWPF
+namespace NPOI.WordTemplateMapper.Interfaces.XWPF
 {
     public interface IXWPFParagraphMapper
     {

@@ -1,6 +1,6 @@
 ﻿using NPOI.WordTemplateMapper.Extensions;
 using NPOI.XWPF.UserModel;
-using NPOI.XWPFTemplateMapper.Interfaces.XWPF;
+using NPOI.WordTemplateMapper.Interfaces.XWPF;
 using System.Text.RegularExpressions;
 
 namespace NPOI.WordTemplateMapper.XWPF

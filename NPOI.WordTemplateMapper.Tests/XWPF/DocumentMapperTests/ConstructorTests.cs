@@ -1,6 +1,4 @@
 ﻿using NPOI.WordTemplateMapper.XWPF;
-using NPOI.XWPF.UserModel;
-using NPOI.XWPFTemplateMapper.Interfaces.XWPF;
 
 namespace NPOI.WordTemplateMapper.Tests.XWPF.DocumentMapperTests
 {

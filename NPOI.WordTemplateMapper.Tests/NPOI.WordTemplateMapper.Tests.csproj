@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NPOI.WordTemplateMapper\NPOI.WordTemplateMapper.csproj" />
-    <ProjectReference Include="..\NPOI.XWPFTemplateMapper.Interfaces\NPOI.XWPFTemplateMapper.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>

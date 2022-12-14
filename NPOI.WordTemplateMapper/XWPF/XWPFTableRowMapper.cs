@@ -1,7 +1,7 @@
 ﻿using NPOI.OpenXmlFormats.Wordprocessing;
 using NPOI.WordTemplateMapper.Extensions;
 using NPOI.XWPF.UserModel;
-using NPOI.XWPFTemplateMapper.Interfaces.XWPF;
+using NPOI.WordTemplateMapper.Interfaces.XWPF;
 
 namespace NPOI.WordTemplateMapper.XWPF
 {
