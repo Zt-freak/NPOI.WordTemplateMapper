@@ -2,42 +2,41 @@
 using NPOI.XWPF.UserModel;
 using NPOI.WordTemplateMapper.Interfaces.XWPF;
 
-namespace NPOI.WordTemplateMapper.Tests.XWPF.DocumentMapperTests
+namespace NPOI.WordTemplateMapper.Tests.XWPF.DocumentMapperTests;
+
+public class MapFooterTests
 {
-    public class MapFooterTests
+    [Fact]
+    public void ItShould_IterateOverEveryParagraph()
     {
-        [Fact]
-        public void ItShould_IterateOverEveryParagraph()
-        {
-            Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
-            paragraphMapperMock
-                .Setup(p => p.MapParagraph(
-                    It.IsAny<XWPFParagraph>(),
-                    It.IsAny<IDictionary<string, object>>()
-                ))
-                .Returns<XWPFParagraph, IDictionary<string, object>>((p, d) => p);
+        Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
+        paragraphMapperMock
+            .Setup(p => p.MapParagraph(
+                It.IsAny<XWPFParagraph>(),
+                It.IsAny<IDictionary<string, object>>()
+            ))
+            .Returns<XWPFParagraph, IDictionary<string, object>>((p, d) => p);
 
-            Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
+        Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
 
-            Dictionary<string, object> data = new();
+        Dictionary<string, object> data = new();
 
-            string template = @"TestDocuments/test1.docx";
-            using FileStream fileStream = File.OpenRead(template);
-            XWPFDocument document = new(fileStream);
+        string template = @"TestDocuments/test1.docx";
+        using FileStream fileStream = File.OpenRead(template);
+        XWPFDocument document = new(fileStream);
 
-            int paragraphCount = document.FooterList.Select( f => f.Paragraphs).Count();
+        int paragraphCount = document.FooterList.Select( f => f.Paragraphs).Count();
 
-            XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
-            mapper.MapFooter(document, data);
+        XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
+        mapper.MapFooter(document, data);
 
-            Assert.Equal(paragraphCount, document.FooterList.Select(f => f.Paragraphs).Count());
-            paragraphMapperMock.Verify(
-                pm => pm.MapParagraph(
-                    It.IsAny<XWPFParagraph>(),
-                    It.IsAny<IDictionary<string, object>>()),
-                    Times.Exactly(document.FooterList.Select(f => f.Paragraphs).Count()
-                )
-            );
-        }
+        Assert.Equal(paragraphCount, document.FooterList.Select(f => f.Paragraphs).Count());
+        paragraphMapperMock.Verify(
+            pm => pm.MapParagraph(
+                It.IsAny<XWPFParagraph>(),
+                It.IsAny<IDictionary<string, object>>()),
+                Times.Exactly(document.FooterList.Select(f => f.Paragraphs).Count()
+            )
+        );
     }
 }

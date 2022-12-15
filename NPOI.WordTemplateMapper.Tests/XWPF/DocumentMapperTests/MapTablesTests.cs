@@ -2,246 +2,245 @@
 using NPOI.XWPF.UserModel;
 using NPOI.WordTemplateMapper.Interfaces.XWPF;
 
-namespace NPOI.WordTemplateMapper.Tests.XWPF.DocumentMapperTests
+namespace NPOI.WordTemplateMapper.Tests.XWPF.DocumentMapperTests;
+
+public class MapTablesTests
 {
-    public class MapTablesTests
+    [Fact]
+    public void ItShould_IterateOverEveryTableRow()
     {
-        [Fact]
-        public void ItShould_IterateOverEveryTableRow()
+        Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
+
+        Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
+        tableRowMapperMock
+            .Setup(t => t.MapDictionaryToRow(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<IDictionary<string, object>>()
+            ))
+            .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
+        tableRowMapperMock
+            .Setup(t => t.MapEnumerableToRow(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<List<Dictionary<string, object>>>()
+            ))
+            .Returns<XWPFTableRow, List<Dictionary<string, object>>>((r, d) => r);
+
+        Dictionary<string, object> data = new()
         {
-            Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
+            { "{{CoolSinger}}", "Rick Astley" }
+        };
 
-            Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
-            tableRowMapperMock
-                .Setup(t => t.MapDictionaryToRow(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<IDictionary<string, object>>()
-                ))
-                .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
-            tableRowMapperMock
-                .Setup(t => t.MapEnumerableToRow(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<List<Dictionary<string, object>>>()
-                ))
-                .Returns<XWPFTableRow, List<Dictionary<string, object>>>((r, d) => r);
+        string template = @"TestDocuments/test2.docx";
+        using FileStream fileStream = File.OpenRead(template);
+        XWPFDocument document = new(fileStream);
 
-            Dictionary<string, object> data = new()
-            {
-                { "{{CoolSinger}}", "Rick Astley" }
-            };
+        int rowCount = document.Tables.SelectMany(t => t.Rows).Select(r => r.GetTableCells()).Count();
 
-            string template = @"TestDocuments/test2.docx";
-            using FileStream fileStream = File.OpenRead(template);
-            XWPFDocument document = new(fileStream);
+        XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
+        mapper.MapTables(document, data);
 
-            int rowCount = document.Tables.SelectMany(t => t.Rows).Select(r => r.GetTableCells()).Count();
+        Assert.Equal(rowCount, document.Tables.SelectMany(t => t.Rows).Select(r => r.GetTableCells()).Count());
+        tableRowMapperMock.Verify(
+            tm => tm.MapDictionaryToRow(It.IsAny<XWPFTableRow>(), It.IsAny<IDictionary<string, object>>()),
+                Times.Exactly(rowCount)
+        );
+    }
 
-            XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
-            mapper.MapTables(document, data);
+    [Fact]
+    public void ItShould_MapEnumerablesToTableRow()
+    {
+        Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
 
-            Assert.Equal(rowCount, document.Tables.SelectMany(t => t.Rows).Select(r => r.GetTableCells()).Count());
-            tableRowMapperMock.Verify(
-                tm => tm.MapDictionaryToRow(It.IsAny<XWPFTableRow>(), It.IsAny<IDictionary<string, object>>()),
-                    Times.Exactly(rowCount)
-            );
-        }
+        Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
+        tableRowMapperMock
+            .Setup(t => t.MapDictionaryToRow(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<IDictionary<string, object>>()
+            ))
+            .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
+        tableRowMapperMock
+            .Setup(t => t.MapEnumerableToRow(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<List<Dictionary<string, object>>>()
+            ))
+            .Returns<XWPFTableRow, List<Dictionary<string, object>>>((r, d) => r); //GetMappingList
+        tableRowMapperMock
+            .Setup(t => t.GetMappingList(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<KeyValuePair<string, IEnumerable<object>>>()
+            ))
+            .Returns<XWPFTableRow, KeyValuePair<string, IEnumerable<object>>>((r, d) => new() { new() });
 
-        [Fact]
-        public void ItShould_MapEnumerablesToTableRow()
+        List<object> theList = new() {
+            new { A = "Chirp", B = "Meow", C = "Woof", D = "Moo", E = "Bonjour", F = "Quack"},
+            new { A = "Monday", B = "Tuesday", C = "Wednesday", D = "Thursday", E = "Friday", F = "Saturday"},
+            new { A = "Red", B = "Green", C = "Blue", D = "Yellow", E = "Magenta", F = "Cyan"}
+        };
+        Dictionary<string, object> data = new()
         {
-            Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
+            { "{{List}}", theList }
+        };
 
-            Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
-            tableRowMapperMock
-                .Setup(t => t.MapDictionaryToRow(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<IDictionary<string, object>>()
-                ))
-                .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
-            tableRowMapperMock
-                .Setup(t => t.MapEnumerableToRow(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<List<Dictionary<string, object>>>()
-                ))
-                .Returns<XWPFTableRow, List<Dictionary<string, object>>>((r, d) => r); //GetMappingList
-            tableRowMapperMock
-                .Setup(t => t.GetMappingList(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<KeyValuePair<string, IEnumerable<object>>>()
-                ))
-                .Returns<XWPFTableRow, KeyValuePair<string, IEnumerable<object>>>((r, d) => new() { new() });
+        string template = @"TestDocuments/test3.docx";
+        using FileStream fileStream = File.OpenRead(template);
+        XWPFDocument document = new(fileStream);
 
-            List<object> theList = new() {
-                new { A = "Chirp", B = "Meow", C = "Woof", D = "Moo", E = "Bonjour", F = "Quack"},
-                new { A = "Monday", B = "Tuesday", C = "Wednesday", D = "Thursday", E = "Friday", F = "Saturday"},
-                new { A = "Red", B = "Green", C = "Blue", D = "Yellow", E = "Magenta", F = "Cyan"}
-            };
-            Dictionary<string, object> data = new()
-            {
-                { "{{List}}", theList }
-            };
+        int rowCount = document.Tables.SelectMany(t => t.Rows).Select(r => r.GetTableCells()).Count();
 
-            string template = @"TestDocuments/test3.docx";
-            using FileStream fileStream = File.OpenRead(template);
-            XWPFDocument document = new(fileStream);
+        XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
+        mapper.MapTables(document, data);
 
-            int rowCount = document.Tables.SelectMany(t => t.Rows).Select(r => r.GetTableCells()).Count();
+        tableRowMapperMock.Verify(
+            tm => tm.MapEnumerableToRow(It.IsAny<XWPFTableRow>(), It.IsAny<List<Dictionary<string, object>>>()),
+                Times.Exactly(rowCount)
+        );
+    }
 
-            XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
-            mapper.MapTables(document, data);
+    [Fact]
+    public void ItShould_CleanUpTableCaption()
+    {
+        Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
 
-            tableRowMapperMock.Verify(
-                tm => tm.MapEnumerableToRow(It.IsAny<XWPFTableRow>(), It.IsAny<List<Dictionary<string, object>>>()),
-                    Times.Exactly(rowCount)
-            );
-        }
+        Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
+        tableRowMapperMock
+            .Setup(t => t.MapDictionaryToRow(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<IDictionary<string, object>>()
+            ))
+            .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
+        tableRowMapperMock
+            .Setup(t => t.MapEnumerableToRow(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<List<Dictionary<string, object>>>()
+            ))
+            .Returns<XWPFTableRow, List<Dictionary<string, object>>>((r, d) => r); //GetMappingList
+        tableRowMapperMock
+            .Setup(t => t.GetMappingList(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<KeyValuePair<string, IEnumerable<object>>>()
+            ))
+            .Returns<XWPFTableRow, KeyValuePair<string, IEnumerable<object>>>((r, d) => new() { new() });
 
-        [Fact]
-        public void ItShould_CleanUpTableCaption()
+        List<object> theList = new() {
+            new { A = "Chirp", B = "Meow", C = "Woof", D = "Moo", E = "Bonjour", F = "Quack"},
+            new { A = "Monday", B = "Tuesday", C = "Wednesday", D = "Thursday", E = "Friday", F = "Saturday"},
+            new { A = "Red", B = "Green", C = "Blue", D = "Yellow", E = "Magenta", F = "Cyan"}
+        };
+        Dictionary<string, object> data = new()
         {
-            Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
+            { "{{List}}", theList }
+        };
 
-            Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
-            tableRowMapperMock
-                .Setup(t => t.MapDictionaryToRow(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<IDictionary<string, object>>()
-                ))
-                .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
-            tableRowMapperMock
-                .Setup(t => t.MapEnumerableToRow(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<List<Dictionary<string, object>>>()
-                ))
-                .Returns<XWPFTableRow, List<Dictionary<string, object>>>((r, d) => r); //GetMappingList
-            tableRowMapperMock
-                .Setup(t => t.GetMappingList(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<KeyValuePair<string, IEnumerable<object>>>()
-                ))
-                .Returns<XWPFTableRow, KeyValuePair<string, IEnumerable<object>>>((r, d) => new() { new() });
+        string template = @"TestDocuments/test3.docx";
+        using FileStream fileStream = File.OpenRead(template);
+        XWPFDocument document = new(fileStream);
 
-            List<object> theList = new() {
-                new { A = "Chirp", B = "Meow", C = "Woof", D = "Moo", E = "Bonjour", F = "Quack"},
-                new { A = "Monday", B = "Tuesday", C = "Wednesday", D = "Thursday", E = "Friday", F = "Saturday"},
-                new { A = "Red", B = "Green", C = "Blue", D = "Yellow", E = "Magenta", F = "Cyan"}
-            };
-            Dictionary<string, object> data = new()
-            {
-                { "{{List}}", theList }
-            };
+        string oldCaption = document.Tables[0].TableCaption;
 
-            string template = @"TestDocuments/test3.docx";
-            using FileStream fileStream = File.OpenRead(template);
-            XWPFDocument document = new(fileStream);
+        XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
+        mapper.MapTables(document, data);
 
-            string oldCaption = document.Tables[0].TableCaption;
+        Assert.False(oldCaption == document.Tables[0].TableCaption);
+        Assert.DoesNotContain("{{List}}", document.Tables[0].TableCaption);
+    }
 
-            XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
-            mapper.MapTables(document, data);
+    [Fact]
+    public void ItShould_MapNoEnumerables_IfMappingListIsEmpty()
+    {
+        Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
 
-            Assert.False(oldCaption == document.Tables[0].TableCaption);
-            Assert.DoesNotContain("{{List}}", document.Tables[0].TableCaption);
-        }
+        Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
+        tableRowMapperMock
+            .Setup(t => t.MapDictionaryToRow(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<IDictionary<string, object>>()
+            ))
+            .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
+        tableRowMapperMock
+            .Setup(t => t.MapEnumerableToRow(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<List<Dictionary<string, object>>>()
+            ))
+            .Returns<XWPFTableRow, List<Dictionary<string, object>>>((r, d) => r); //GetMappingList
+        tableRowMapperMock
+            .Setup(t => t.GetMappingList(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<KeyValuePair<string, IEnumerable<object>>>()
+            ))
+            .Returns<XWPFTableRow, KeyValuePair<string, IEnumerable<object>>>((r, d) => new() { });
 
-        [Fact]
-        public void ItShould_MapNoEnumerables_IfMappingListIsEmpty()
+        List<object> theList = new() {
+            new { A = "Chirp", B = "Meow", C = "Woof", D = "Moo", E = "Bonjour", F = "Quack"},
+            new { A = "Monday", B = "Tuesday", C = "Wednesday", D = "Thursday", E = "Friday", F = "Saturday"},
+            new { A = "Red", B = "Green", C = "Blue", D = "Yellow", E = "Magenta", F = "Cyan"}
+        };
+        Dictionary<string, object> data = new()
         {
-            Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
+            { "{{List}}", theList }
+        };
 
-            Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
-            tableRowMapperMock
-                .Setup(t => t.MapDictionaryToRow(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<IDictionary<string, object>>()
-                ))
-                .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
-            tableRowMapperMock
-                .Setup(t => t.MapEnumerableToRow(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<List<Dictionary<string, object>>>()
-                ))
-                .Returns<XWPFTableRow, List<Dictionary<string, object>>>((r, d) => r); //GetMappingList
-            tableRowMapperMock
-                .Setup(t => t.GetMappingList(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<KeyValuePair<string, IEnumerable<object>>>()
-                ))
-                .Returns<XWPFTableRow, KeyValuePair<string, IEnumerable<object>>>((r, d) => new() { });
+        string template = @"TestDocuments/test3.docx";
+        using FileStream fileStream = File.OpenRead(template);
+        XWPFDocument document = new(fileStream);
 
-            List<object> theList = new() {
-                new { A = "Chirp", B = "Meow", C = "Woof", D = "Moo", E = "Bonjour", F = "Quack"},
-                new { A = "Monday", B = "Tuesday", C = "Wednesday", D = "Thursday", E = "Friday", F = "Saturday"},
-                new { A = "Red", B = "Green", C = "Blue", D = "Yellow", E = "Magenta", F = "Cyan"}
-            };
-            Dictionary<string, object> data = new()
-            {
-                { "{{List}}", theList }
-            };
+        int rowCount = document.Tables.SelectMany(t => t.Rows).Select(r => r.GetTableCells()).Count();
 
-            string template = @"TestDocuments/test3.docx";
-            using FileStream fileStream = File.OpenRead(template);
-            XWPFDocument document = new(fileStream);
+        XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
+        mapper.MapTables(document, data);
 
-            int rowCount = document.Tables.SelectMany(t => t.Rows).Select(r => r.GetTableCells()).Count();
+        tableRowMapperMock.Verify(
+            tm => tm.MapEnumerableToRow(It.IsAny<XWPFTableRow>(), It.IsAny<List<Dictionary<string, object>>>()),
+                Times.Exactly(0)
+        );
+    }
 
-            XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
-            mapper.MapTables(document, data);
+    [Fact]
+    public void ItShould_MapNoEnumerables_IfMappingListIsNull()
+    {
+        Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
 
-            tableRowMapperMock.Verify(
-                tm => tm.MapEnumerableToRow(It.IsAny<XWPFTableRow>(), It.IsAny<List<Dictionary<string, object>>>()),
-                    Times.Exactly(0)
-            );
-        }
+        Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
+        tableRowMapperMock
+            .Setup(t => t.MapDictionaryToRow(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<IDictionary<string, object>>()
+            ))
+            .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
+        tableRowMapperMock
+            .Setup(t => t.MapEnumerableToRow(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<List<Dictionary<string, object>>>()
+            ))
+            .Returns<XWPFTableRow, List<Dictionary<string, object>>>((r, d) => r); //GetMappingList
+        tableRowMapperMock
+            .Setup(t => t.GetMappingList(
+                It.IsAny<XWPFTableRow>(),
+                It.IsAny<KeyValuePair<string, IEnumerable<object>>>()
+            ))
+            .Returns<XWPFTableRow, KeyValuePair<string, IEnumerable<object>>>((r, d) => null!);
 
-        [Fact]
-        public void ItShould_MapNoEnumerables_IfMappingListIsNull()
+        List<object> theList = new() {
+            new { A = "Chirp", B = "Meow", C = "Woof", D = "Moo", E = "Bonjour", F = "Quack"},
+            new { A = "Monday", B = "Tuesday", C = "Wednesday", D = "Thursday", E = "Friday", F = "Saturday"},
+            new { A = "Red", B = "Green", C = "Blue", D = "Yellow", E = "Magenta", F = "Cyan"}
+        };
+        Dictionary<string, object> data = new()
         {
-            Mock<IXWPFParagraphMapper> paragraphMapperMock = new();
+            { "{{List}}", theList }
+        };
 
-            Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
-            tableRowMapperMock
-                .Setup(t => t.MapDictionaryToRow(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<IDictionary<string, object>>()
-                ))
-                .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
-            tableRowMapperMock
-                .Setup(t => t.MapEnumerableToRow(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<List<Dictionary<string, object>>>()
-                ))
-                .Returns<XWPFTableRow, List<Dictionary<string, object>>>((r, d) => r); //GetMappingList
-            tableRowMapperMock
-                .Setup(t => t.GetMappingList(
-                    It.IsAny<XWPFTableRow>(),
-                    It.IsAny<KeyValuePair<string, IEnumerable<object>>>()
-                ))
-                .Returns<XWPFTableRow, KeyValuePair<string, IEnumerable<object>>>((r, d) => null!);
+        string template = @"TestDocuments/test3.docx";
+        using FileStream fileStream = File.OpenRead(template);
+        XWPFDocument document = new(fileStream);
 
-            List<object> theList = new() {
-                new { A = "Chirp", B = "Meow", C = "Woof", D = "Moo", E = "Bonjour", F = "Quack"},
-                new { A = "Monday", B = "Tuesday", C = "Wednesday", D = "Thursday", E = "Friday", F = "Saturday"},
-                new { A = "Red", B = "Green", C = "Blue", D = "Yellow", E = "Magenta", F = "Cyan"}
-            };
-            Dictionary<string, object> data = new()
-            {
-                { "{{List}}", theList }
-            };
+        int rowCount = document.Tables.SelectMany(t => t.Rows).Select(r => r.GetTableCells()).Count();
 
-            string template = @"TestDocuments/test3.docx";
-            using FileStream fileStream = File.OpenRead(template);
-            XWPFDocument document = new(fileStream);
+        XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
+        mapper.MapTables(document, data);
 
-            int rowCount = document.Tables.SelectMany(t => t.Rows).Select(r => r.GetTableCells()).Count();
-
-            XWPFDocumentMapper mapper = new(paragraphMapperMock.Object, tableRowMapperMock.Object);
-            mapper.MapTables(document, data);
-
-            tableRowMapperMock.Verify(
-                tm => tm.MapEnumerableToRow(It.IsAny<XWPFTableRow>(), It.IsAny<List<Dictionary<string, object>>>()),
-                    Times.Exactly(0)
-            );
-        }
+        tableRowMapperMock.Verify(
+            tm => tm.MapEnumerableToRow(It.IsAny<XWPFTableRow>(), It.IsAny<List<Dictionary<string, object>>>()),
+                Times.Exactly(0)
+        );
     }
 }
