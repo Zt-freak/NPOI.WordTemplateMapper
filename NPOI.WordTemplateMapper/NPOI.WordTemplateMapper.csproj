@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Title>NPOI.WordTemplateMapper</Title>
+    <Title>Apodemus.NPOI.WordTemplateMapper</Title>
     <Authors>Zt-freak</Authors>
     <Description>A Word document mapper</Description>
     <Copyright>Apache-2.0</Copyright>

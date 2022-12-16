@@ -11,7 +11,7 @@
     <PackageProjectUrl>https://github.com/Zt-freak/NPOI.WordTemplateMapper</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Zt-freak/NPOI.WordTemplateMapper</RepositoryUrl>
     <PackageTags>NPOI; Word; docx; mapping; XWPF</PackageTags>
-    <Title>NPOI.WordTemplateMapper.Interfaces</Title>
+    <Title>Apodemus.NPOI.WordTemplateMapper.Interfaces</Title>
     <PackageIcon>xwpfmapper-logo.png</PackageIcon>
   </PropertyGroup>
 
