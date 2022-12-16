@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Zt-freak</Authors>
     <Description>Interfaces for a Word document mapper</Description>
-    <Copyright>Apache-2.0</Copyright>
+    <Copyright>Apache-2.0 license</Copyright>
     <PackageProjectUrl>https://github.com/Zt-freak/NPOI.WordTemplateMapper</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Zt-freak/NPOI.WordTemplateMapper</RepositoryUrl>
     <PackageTags>NPOI; Word; docx; mapping; XWPF</PackageTags>

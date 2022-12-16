@@ -17,6 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPOI.WordTemplateMapper.Ben
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPOI.WordTemplateMapper.Interfaces", "NPOI.WordTemplateMapper.Interfaces\NPOI.WordTemplateMapper.Interfaces.csproj", "{09514DE4-467B-4319-8761-4CCFFF596275}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AC2DB9A2-DBA1-4453-B32E-CF590703629B}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		.github\workflows\github-release.yml = .github\workflows\github-release.yml
+		.github\workflows\nuget-release.yml = .github\workflows\nuget-release.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
