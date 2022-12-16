@@ -7,13 +7,10 @@ namespace NPOI.WordTemplateMapper.Extensions
     {
         private static readonly string alphaNumericSelectorRegex = @"[a-zA-Z0-9.\s\[\]]+";
 
-        internal static List<Dictionary<string, object>> ToList(this KeyValuePair<string, IEnumerable<object>>? @this)
+        internal static List<Dictionary<string, object>> ToList(this KeyValuePair<string, IEnumerable<object>> @this)
         {
-            if (@this == null)
-                return new();
-
             List<Dictionary<string, object>> dictionaryList = new();
-            KeyValuePair<string, IEnumerable<object>> mappingPair = (KeyValuePair<string, IEnumerable<object>>)@this;
+            KeyValuePair<string, IEnumerable<object>> mappingPair = @this;
 
             foreach (object mappingObject in mappingPair.Value)
             {

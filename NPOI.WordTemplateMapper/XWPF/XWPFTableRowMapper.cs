@@ -35,7 +35,8 @@ public class XWPFTableRowMapper : IXWPFTableRowMapper
         if (mappingPair == null)
             return new();
 
-        List<Dictionary<string, object>> mappingList = mappingPair.ToList();
+        KeyValuePair<string, IEnumerable<object>> castedPair = (KeyValuePair<string, IEnumerable<object>>)mappingPair;
+        List<Dictionary<string, object>> mappingList = castedPair.ToList();
         if (!GetParagraphsWithMappings(tableRow, mappingList.First()).Any())
             return new();
 
@@ -66,7 +67,7 @@ public class XWPFTableRowMapper : IXWPFTableRowMapper
         );
 
         List<XWPFTableRow> newRows = new();
-        for (int i = 0; i < mappingList.Count(); i++)
+        for (int i = 0; i < mappingList.Count; i++)
         {
             CT_Row newCtRow = tableRow.GetCTRow().Copy();
             XWPFTableRow copiedRow = new(newCtRow, tableRow.GetTable());

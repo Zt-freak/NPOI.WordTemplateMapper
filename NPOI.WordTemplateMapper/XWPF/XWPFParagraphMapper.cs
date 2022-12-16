@@ -31,7 +31,7 @@ public class XWPFParagraphMapper : IXWPFParagraphMapper
             do
             {
                 KeyValuePair<string, string> mappedValue = GetMappedValue(paragraph, mapping);
-                string oldText = $"{paragraph.Text}";
+                string oldText = paragraph.Text;
 
                 // Workaround for malfunctioning ReplaceText from NPOI
                 string newText = paragraph.Text.Replace(mappedValue.Key, mappedValue.Value);
