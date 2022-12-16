@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace NPOI.WordTemplateMapper.Extensions
 {
@@ -23,7 +24,7 @@ namespace NPOI.WordTemplateMapper.Extensions
             return dictionaryList;
         }
 
-        internal static Dictionary<string, object> ToIndexDictionary(this KeyValuePair<string, IList<object>> @this, string? prependKey = null)
+        internal static Dictionary<string, object> ToIndexDictionary(this KeyValuePair<string, IList> @this, string? prependKey = null)
         {
             Dictionary<string, object> mappingDictionary = new();
 
