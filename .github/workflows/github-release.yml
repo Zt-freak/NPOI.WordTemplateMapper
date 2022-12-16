@@ -1,4 +1,4 @@
-name: Release to NuGet
+name: Release to GitHub Packages
 
 on:
   workflow_dispatch:
