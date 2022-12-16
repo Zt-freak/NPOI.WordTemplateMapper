@@ -1,10 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>NPOI.WordTemplateMapper</Title>
+    <Authors>Zt-freak</Authors>
+    <Description>A Word document mapper</Description>
+    <Copyright>Apache-2.0</Copyright>
+    <PackageProjectUrl>https://github.com/Zt-freak/NPOI.WordTemplateMapper</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Zt-freak/NPOI.WordTemplateMapper</RepositoryUrl>
+    <PackageTags>NPOI; Word; docx; mapping; XWPF</PackageTags>
+    <PackageIcon>xwpfmapper-logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\xwpfmapper-logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NPOI" Version="2.6.0" />
