@@ -21,6 +21,6 @@ jobs:
     - name: Pack nugets
       run: dotnet pack -c Release --no-build --output .
     - name: GitHub auth
-      run: dotnet nuget add source --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/Zt-freak/index.json"
+      run: dotnet nuget add source --username USERNAME --password ${{ secrets.HUB_API_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/Zt-freak/index.json"
     - name: Push to GitHub Packages
-      run: dotnet nuget push "*.nupkg" --api-key ${{secrets.GITHUB_TOKEN}} --source "github"
+      run: dotnet nuget push "*.nupkg" --api-key ${{secrets.HUB_API_TOKEN}} --source "github"
