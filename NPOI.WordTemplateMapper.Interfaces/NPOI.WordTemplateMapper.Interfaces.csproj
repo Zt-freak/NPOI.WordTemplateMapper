@@ -13,6 +13,7 @@
     <PackageTags>NPOI; Word; docx; mapping; XWPF</PackageTags>
     <Title>Apodemus.NPOI.WordTemplateMapper.Interfaces</Title>
     <PackageIcon>xwpfmapper-logo.png</PackageIcon>
+    <PackageId>Apodemus.$(AssemblyName)</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

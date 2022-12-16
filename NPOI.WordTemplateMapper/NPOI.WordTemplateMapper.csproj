@@ -14,6 +14,8 @@
     <PackageTags>NPOI; Word; docx; mapping; XWPF</PackageTags>
     <PackageIcon>xwpfmapper-logo.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Product>Apodemus.$(AssemblyName)</Product>
+    <PackageId>Apodemus.$(AssemblyName)</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
