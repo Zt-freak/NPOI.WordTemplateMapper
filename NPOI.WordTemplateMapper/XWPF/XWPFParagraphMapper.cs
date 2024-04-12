@@ -3,6 +3,7 @@ using NPOI.XWPF.UserModel;
 using NPOI.WordTemplateMapper.Interfaces.XWPF;
 using System.Text.RegularExpressions;
 using System.Collections;
+using NPOI.WordTemplateMapper.Extensions.XWPF;
 
 namespace NPOI.WordTemplateMapper.XWPF;
 
@@ -33,10 +34,7 @@ public class XWPFParagraphMapper : IXWPFParagraphMapper
                 KeyValuePair<string, string> mappedValue = GetMappedValue(paragraph, mapping);
                 string oldText = paragraph.Text;
 
-                // Workaround for malfunctioning ReplaceText from NPOI
-                string newText = paragraph.Text.Replace(mappedValue.Key, mappedValue.Value);
-                if (!string.IsNullOrEmpty(paragraph.Text))
-                    paragraph.ReplaceText(paragraph.Text, newText);
+                paragraph.ReplaceTextKeepLineEndings(mappedValue.Key, mappedValue.Value);
 
                 if (oldText == paragraph.Text)
                     keepMapping = false;
