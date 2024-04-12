@@ -10,15 +10,18 @@ public class MapParagraphTests
     [Theory]
     [InlineData("{{A}} dolor sit amet", "lorem ipsum dolor sit amet")]
     [InlineData("{{B}} jumps over the lazy dog", "the quick brown fox jumps over the lazy dog")]
+    [InlineData("{{D}} at all\ntimes.", "The missile\nknows where\nit is at all\ntimes.\n")]
     [InlineData("", "")]
     [InlineData("ABCDEFG", "ABCDEFG")]
+    [InlineData("Hey guys\ndid you know\nvaporeon", "Hey guys\ndid you know\nvaporeon")]
     public void ItShould_MapParagraph(string paragraphText, string expecctedText)
     {
         Dictionary<string, object> data = new()
         {
             { "{{A}}", "lorem ipsum" },
             { "{{B}}", "the quick brown fox" },
-            { "{{C}}", "het fikse aquaduct" }
+            { "{{C}}", "het fikse aquaduct" },
+            { "{{D}}", "The missile\nknows where\nit is" },
         };
 
         CT_P ctParagraph = new();

@@ -19,11 +19,11 @@ public class MapDocumentTests
 
         Mock<IXWPFTableRowMapper> tableRowMapperMock = new();
         tableRowMapperMock
-.Setup(t => t.MapDictionaryToRow(
-    It.IsAny<XWPFTableRow>(),
-    It.IsAny<IDictionary<string, object>>()
-))
-.Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
+        .Setup(t => t.MapDictionaryToRow(
+            It.IsAny<XWPFTableRow>(),
+            It.IsAny<IDictionary<string, object>>()
+        ))
+        .Returns<XWPFTableRow, IDictionary<string, object>>((r, d) => r);
         tableRowMapperMock
             .Setup(t => t.MapEnumerableToRow(
                 It.IsAny<XWPFTableRow>(),
