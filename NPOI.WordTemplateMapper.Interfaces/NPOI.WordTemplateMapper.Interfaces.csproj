@@ -15,6 +15,7 @@
     <PackageIcon>xwpfmapper-logo.png</PackageIcon>
     <PackageId>Apodemus.$(AssemblyName)</PackageId>
     <Product>Apodemus.$(AssemblyName)</Product>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
