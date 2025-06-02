@@ -44,8 +44,13 @@ public class XWPFDocumentMapper : IXWPFDocumentMapper
     public XWPFDocument MapFooter(XWPFDocument document, IDictionary<string, object> mappingDictionary)
     {
         foreach (XWPFFooter footer in document.FooterList)
+        {
             foreach (XWPFParagraph? paragraph in footer.Paragraphs)
                 _paragraphMapper.MapParagraph(paragraph, mappingDictionary);
+            
+            foreach (XWPFTable? headerTable in footer.Tables)
+                MapTable(headerTable, mappingDictionary);
+        }
 
         return document;
     }
@@ -53,8 +58,12 @@ public class XWPFDocumentMapper : IXWPFDocumentMapper
     public XWPFDocument MapHeader(XWPFDocument document, IDictionary<string, object> mappingDictionary)
     {
         foreach (XWPFHeader header in document.HeaderList)
+        {
             foreach (XWPFParagraph? paragraph in header.Paragraphs)
                 _paragraphMapper.MapParagraph(paragraph, mappingDictionary);
+            foreach (XWPFTable? headerTable in header.Tables)
+                MapTable(headerTable, mappingDictionary);
+        }
 
         return document;
     }
@@ -62,33 +71,35 @@ public class XWPFDocumentMapper : IXWPFDocumentMapper
     public XWPFDocument MapTables(XWPFDocument document, IDictionary<string, object> mappingDictionary)
     {
         foreach (XWPFTable table in document.Tables)
+            MapTable(table, mappingDictionary);
+        return document;
+    }
+    private void MapTable(XWPFTable table, IDictionary<string, object> mappingDictionary)
+    {
+        KeyValuePair<string, IEnumerable<object>>? mappingObject = null;
+        string tableCaption = table.TableCaption;
+
+        KeyValuePair<string, object> mappingPair = mappingDictionary.FirstOrDefault(m => tableCaption.Contains(m.Key));
+        if (mappingPair.Value is IEnumerable<object> mappingEnumerable)
         {
-            KeyValuePair<string, IEnumerable<object>>? mappingObject = null;
-            string tableCaption = table.TableCaption;
+            mappingObject = new(mappingPair.Key, mappingEnumerable);
 
-            KeyValuePair<string, object> mappingPair = mappingDictionary.FirstOrDefault(m => tableCaption.Contains(m.Key));
-            if (mappingPair.Value is IEnumerable<object> mappingEnumerable)
+            string newCaption = table.TableCaption.Replace(mappingPair.Key, string.Empty);
+            if (!string.IsNullOrWhiteSpace(newCaption))
+                table.TableCaption = newCaption;
+        }
+
+        for (int i = table.Rows.Count - 1; i >= 0; i--)
+        {
+            XWPFTableRow currentRow = table.Rows[i];
+            _tableRowMapper.MapDictionaryToRow(currentRow, mappingDictionary);
+
+            if(mappingObject != null)
             {
-                mappingObject = new(mappingPair.Key, mappingEnumerable);
-
-                string newCaption = table.TableCaption.Replace(mappingPair.Key, string.Empty);
-                if (!string.IsNullOrWhiteSpace(newCaption))
-                    table.TableCaption = newCaption;
-            }
-
-            for (int i = table.Rows.Count - 1; i >= 0; i--)
-            {
-                XWPFTableRow currentRow = table.Rows[i];
-                _tableRowMapper.MapDictionaryToRow(currentRow, mappingDictionary);
-
-                if(mappingObject != null)
-                {
-                    List<Dictionary<string, object>> mappingList = _tableRowMapper.GetMappingList(currentRow, mappingObject);
-                    if (mappingList != null && mappingList.Any())
-                        _tableRowMapper.MapEnumerableToRow(currentRow, mappingList);
-                }
+                List<Dictionary<string, object>> mappingList = _tableRowMapper.GetMappingList(currentRow, mappingObject);
+                if (mappingList != null && mappingList.Any())
+                    _tableRowMapper.MapEnumerableToRow(currentRow, mappingList);
             }
         }
-        return document;
     }
 }
